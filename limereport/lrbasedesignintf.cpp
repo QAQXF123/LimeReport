@@ -1892,4 +1892,13 @@ void BaseDesignIntf::processPopUpAction(QAction *action){
     }
 }
 
+bool BaseDesignIntf::hideZeroValue()
+{
+    return m_hideZeroValue;
+}
+void BaseDesignIntf::setHideZeroValue(bool value)
+{
+    m_hideZeroValue = value;
+}
+
 } //namespace LimeReport

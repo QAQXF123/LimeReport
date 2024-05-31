@@ -1259,6 +1259,34 @@ void ReportEnginePrivate::clearRenderingPages(){
     m_renderingPages.clear();
 }
 
+void ReportEnginePrivate::fillFullPaper(PageItemDesignIntf *page, ReportPages renderedPages)
+{
+    if (page->fillFullPaper())
+        return;
+    if (renderedPages.count() <= 0)
+        return;
+    // 参考band
+    BandDesignIntf *dataBand = page->bandByType(DataBandDesignIntf::BandsType::Data);
+    if (dataBand && dataBand->startNewPage())
+        return;
+    BandDesignIntf *refBand = nullptr;
+    if (!page->blankRowRefBand().isEmpty())
+        refBand = page->bandByName(page->blankRowRefBand());
+    if (refBand == nullptr)
+        return;
+    // 插入位置：ReportFooter=10 》 TearOffBand=11 》 PageFooter=12
+    BandDesignIntf *posBand = nullptr;
+    if (page->blankRowInsertPosition().isEmpty()) {
+        posBand = page->bandByType(DataBandDesignIntf::BandsType::ReportFooter);
+        if (posBand == nullptr)
+            posBand = page->bandByType(DataBandDesignIntf::BandsType::TearOffBand);
+        if (posBand == nullptr)
+            posBand = page->bandByType(DataBandDesignIntf::BandsType::PageFooter);
+    } else
+        posBand = page->bandByName(page->blankRowInsertPosition());
+    QSharedPointer<PageItemDesignIntf> renderPage = renderedPages.last();
+}
+
 ReportPages ReportEnginePrivate::renderToPages()
 {
     int startTOCPage = -1;
@@ -1331,9 +1359,10 @@ ReportPages ReportEnginePrivate::renderToPages()
                 }
             }
 
-            for (int i=0; i<m_renderingPages.count(); ++i){
-                PageItemDesignIntf* page = m_renderingPages.at(i);
-                if (page->isTOC()){
+            for (int i = 0; i < m_renderingPages.count(); ++i) {
+                PageItemDesignIntf *page = m_renderingPages.at(i);
+                fillFullPaper(page, result);
+                if (page->isTOC()) {
                     page->setReportSettings(&m_reportSettings);
                     if (i < m_renderingPages.count()){
                         PageItemDesignIntf* secondPage = 0;

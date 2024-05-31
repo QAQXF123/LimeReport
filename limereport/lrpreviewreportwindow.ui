@@ -35,7 +35,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuView">
@@ -76,6 +76,7 @@
    </attribute>
    <addaction name="actionPrint"/>
    <addaction name="actionEdit_Mode"/>
+   <addaction name="actionOpen_file"/>
    <addaction name="actionSaveToFile"/>
    <addaction name="actionPrint_To_PDF"/>
    <addaction name="separator"/>
@@ -337,6 +338,21 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+  </action>
+  <action name="actionOpen_file">
+   <property name="icon">
+    <iconset resource="report.qrc">
+     <normaloff>:/report/images/folder</normaloff>:/report/images/folder</iconset>
+   </property>
+   <property name="text">
+    <string>Open file</string>
+   </property>
+   <property name="toolTip">
+    <string>Open file</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
    </property>
   </action>
  </widget>

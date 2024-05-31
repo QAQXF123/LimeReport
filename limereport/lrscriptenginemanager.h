@@ -358,6 +358,9 @@ public:
     Q_INVOKABLE QVariant calcGroupFunction(const QString& name, const QString& expressionID, const QString& bandName);
     Q_INVOKABLE QVariant line(const QString& bandName);
     Q_INVOKABLE QVariant numberFormat(QVariant value, const char &format, int precision, const QString& locale);
+    Q_INVOKABLE QVariant cnNO(QVariant value);                   // add by hwf
+    Q_INVOKABLE QVariant CNYBig(QVariant value, int digit = -2); // add by hwf
+    Q_INVOKABLE QVariant round(QVariant value, int digit = -2);  // add by hwf
     Q_INVOKABLE QVariant dateFormat(QVariant value, const QString& format, const QString& locale);
     Q_INVOKABLE QVariant timeFormat(QVariant value, const QString& format);
     Q_INVOKABLE QVariant dateTimeFormat(QVariant value, const QString& format, const QString& locale);
@@ -525,6 +528,9 @@ private:
     Q_DISABLE_COPY(ScriptEngineManager)
     bool createLineFunction();
     bool createNumberFomatFunction();
+    bool createCNNOFunction();   // add by hwf
+    bool createCNYBigFunction(); // add by hwf
+    bool createRoundFunction();  // add by hwf
     bool createDateFormatFunction();
     bool createTimeFormatFunction();
     bool createDateTimeFormatFunction();

@@ -15,6 +15,8 @@ INCLUDEPATH += \
     $$REPORT_PATH/scripteditor
 
 SOURCES += \
+    $$PWD/exporters/lrexcelexportor.cpp \
+    $$PWD/exporters/lrwordexportor.cpp \
     $$PWD/scripteditor/lrcompletermodel.cpp \
     $$REPORT_PATH/bands/lrpageheader.cpp \
     $$REPORT_PATH/bands/lrpagefooter.cpp \
@@ -96,6 +98,8 @@ CONFIG(svg) {
 }
 
 HEADERS += \
+    $$PWD/exporters/lrexcelexportor.h \
+    $$PWD/exporters/lrwordexportor.h \
     $$PWD/items/lreditableimageitemintf.h \
     $$PWD/scripteditor/lrcompletermodel.h \
     $$REPORT_PATH/base/lrsingleton.h \

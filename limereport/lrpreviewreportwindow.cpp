@@ -567,5 +567,12 @@ void PreviewReportWindow::slotCancelPrinting(bool)
     m_previewReportWidget->d_ptr->m_report->cancelPrinting();
 }
 
+// add by hwf
+void PreviewReportWindow::on_actionOpen_file_triggered()
+{
+    QString file = QFileDialog::getOpenFileName(this, "Open file");
+    m_previewReportWidget->loadFromFile(file);
+}
+
 }// namespace LimeReport
 

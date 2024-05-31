@@ -784,6 +784,53 @@ bool ScriptEngineManager::createNumberFomatFunction()
     return addFunction(fd);
 }
 
+bool ScriptEngineManager::createCNNOFunction()
+{
+    JSFunctionDesc fd;
+
+    fd.setManager(m_functionManager);
+    fd.setManagerName(LimeReport::Const::FUNCTION_MANAGER_NAME);
+    fd.setCategory(tr("NUMBER"));
+    fd.setName("cnNO");
+    fd.setDescription("cnNO(\"" + tr("Value") + "\")");
+    fd.setScriptWrapper(QString("function cnNO(value){"
+                                "return %1.cnNO(value);}")
+                            .arg(LimeReport::Const::FUNCTION_MANAGER_NAME));
+    return addFunction(fd);
+}
+
+bool ScriptEngineManager::createCNYBigFunction()
+{
+    JSFunctionDesc fd;
+
+    fd.setManager(m_functionManager);
+    fd.setManagerName(LimeReport::Const::FUNCTION_MANAGER_NAME);
+    fd.setCategory(tr("NUMBER"));
+    fd.setName("CNYBig");
+    fd.setDescription("CNYBig(\"" + tr("Value") + "\",\"" + tr("Digit") + "\")");
+    fd.setScriptWrapper(QString("function CNYBig(value, digit){"
+                                " if(typeof(digit)==='undefined') digit=-2; "
+                                "return %1.CNYBig(value,digit);}")
+                            .arg(LimeReport::Const::FUNCTION_MANAGER_NAME));
+    return addFunction(fd);
+}
+
+bool ScriptEngineManager::createRoundFunction()
+{
+    JSFunctionDesc fd;
+
+    fd.setManager(m_functionManager);
+    fd.setManagerName(LimeReport::Const::FUNCTION_MANAGER_NAME);
+    fd.setCategory(tr("NUMBER"));
+    fd.setName("round");
+    fd.setDescription("round(\"" + tr("Value") + "\",\"" + tr("Digit") + "\")");
+    fd.setScriptWrapper(QString("function round(value, digit){"
+                                " if(typeof(digit)==='undefined') digit=-2; "
+                                "return %1.round(value,digit);}")
+                            .arg(LimeReport::Const::FUNCTION_MANAGER_NAME));
+    return addFunction(fd);
+}
+
 bool ScriptEngineManager::createDateFormatFunction(){
     JSFunctionDesc fd;
 
@@ -1158,6 +1205,9 @@ ScriptEngineManager::ScriptEngineManager()
 #endif
     createLineFunction();
     createNumberFomatFunction();
+    createCNNOFunction();  // add by hwf
+    createCNYBigFunction(); // add by hwf
+    createRoundFunction(); // add by hwf
     createDateFormatFunction();
     createTimeFormatFunction();
     createDateTimeFormatFunction();
@@ -1809,6 +1859,126 @@ QVariant ScriptFunctionsManager::numberFormat(QVariant value, const char &format
 {
     return (locale.isEmpty()) ? QString::number(value.toDouble(),format,precision):
                                 QLocale(locale).toString(value.toDouble(),format,precision);
+}
+
+QVariant ScriptFunctionsManager::cnNO(QVariant value)
+{
+    int number = value.toInt();
+    if (number == 0)
+        return QVariant("零");
+    QString result;
+    bool bfs = false;
+    if (number < 0) {
+        bfs = true;
+        number = qAbs(number);
+    }
+    static QString digit[] = {"零", "一", "二", "三", "四", "五", "六", "七", "八", "九"};
+    static QString unit[] = {"", "十", "百", "千", "万"};
+    int unitPos = 0;
+    while (number > 0) {
+        int digitVal = number % 10;
+        if (digitVal != 0) {
+            result.prepend(digit[digitVal] + unit[unitPos]);
+        } else if (!result.isEmpty() && !result.startsWith(digit[0])) {
+            result.prepend(digit[0]);
+        }
+        number /= 10;
+        unitPos++;
+    }
+    // 特殊处理开头的“一十”转换为“十”
+    if (result.startsWith("一十"))
+        result = result.mid(1);
+    if (bfs)
+        result = "负" + result;
+    return QVariant(result);
+}
+
+QVariant ScriptFunctionsManager::CNYBig(QVariant value, int digit)
+{
+    double Fnumber = round(value.toDouble(), digit).toDouble();
+    if (qFuzzyIsNull(Fnumber))
+        return QVariant("零");
+    //判断正负号
+    QString numberSign; //存储符号
+    if (Fnumber < 0)
+        numberSign = "负";
+    //将数据的绝对值 转换成字符串，如-58 转成 “58.00”
+    QString number = QString::number(qAbs(Fnumber), 'f', 2); //qAbs绝对值 ，保留两位小数
+    QString Left_of_Point;                                   //整数部分
+    int length = number.length() - 3; //整数部分的长度，（精确度为2，去除小数和小数点）
+    if (length > 12) {
+        //qDebug()<<"输入的数值超过范围！"
+        return "输入的数值超过范围！";
+    }
+    QStringList numerical_unit
+        = {"", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟"};
+    QStringList numerical_value = {"零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"};
+
+    //数数整数低位多少个连零
+    int counter_0 = 0;
+    for (int i = length - 1; i >= 0; i--) {
+        if ((number[i].toLatin1() - '0') == 0) //从个位开始，向高位走
+            counter_0++;
+        else
+            break;
+    }
+    if (length == 1 && counter_0 == 1) //0.x
+        counter_0 = 0;                 //不进行过滤
+
+    //1400  0.2
+
+    for (int i = 0, flag = 1; i < length - counter_0; i++) {
+        //5     8       1    2   3
+        //伍 拾 捌       壹佰 贰拾 叁
+        if ((number[i].toLatin1() - '0') == 0) {
+            if ((flag != 0 && (length - 1 - i) % 4 != 0)
+                || length == 1)            //flag！=0  表示前一个数值 不为0
+                Left_of_Point += "零";     //后面不用添加 单位
+            if ((length - 1 - i) % 4 == 0) //如果0处于分段处，后面需添加单位
+                Left_of_Point += numerical_unit[length - 1 - i]; //添加数值单位
+
+            flag = 0; //标记
+
+        } else {
+            flag = 1;
+            Left_of_Point += numerical_value[number[i].toLatin1() - '0']; //'5'-'0'==5
+            Left_of_Point += numerical_unit[length - 1 - i];              //添加数值单位
+        }
+    }
+    //QString Right_of_Point;//小数点右侧，小数部分(保留两位)  xxxx.yy
+    int totalLength = number.length();
+    if (number[totalLength - 2] == '0' && number[totalLength - 1] == '0') {
+        QString Bigcn = numberSign + Left_of_Point + "元整";
+        return Bigcn;
+    } else if (number[totalLength - 2] != '0' && number[totalLength - 1] == '0') {
+        QString Bigcn = numberSign + Left_of_Point + "点"
+                        + numerical_value[number[totalLength - 2].toLatin1() - '0'] + "元";
+        return Bigcn;
+    } else {
+        QString Bigcn = numberSign + Left_of_Point + "点"
+                        + numerical_value[number[totalLength - 2].toLatin1() - '0']
+                        + numerical_value[number[totalLength - 1].toLatin1() - '0'] + "元";
+        return Bigcn;
+    }
+    return "cny exception";
+}
+
+QVariant ScriptFunctionsManager::round(QVariant value, int digit)
+{
+    double d = value.toDouble();
+    double lp = qPow(10.0, digit);
+    if (d < 0) {
+        d = floor(d / lp - 0.500000001) * lp;
+    } else {
+        d = floor(d / lp + 0.500000001) * lp;
+    }
+    int iBit;
+    if (digit < 0) {
+        iBit = qAbs(digit);
+    } else {
+        iBit = 0;
+    }
+    return QString::number(d, 'f', iBit);
 }
 
 QVariant ScriptFunctionsManager::dateFormat(QVariant value, const QString &format, const QString& locale)

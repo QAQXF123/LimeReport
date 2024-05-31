@@ -122,6 +122,8 @@ private slots:
     void slotPagePrintingFinished(int pageIndex);
     void slotPrintingFinished();
     void slotCancelPrinting(bool);
+    void on_actionOpen_file_triggered();
+
 signals:
     void onSave(bool& saved, LimeReport::IPreparedPages* pages);
 private:

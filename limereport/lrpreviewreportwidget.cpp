@@ -280,6 +280,13 @@ void PreviewReportWidget::pageNavigatorChanged(int value)
     d_ptr->m_changingPage=false;
 }
 
+void PreviewReportWidget::loadFromFile(QString &fileName)
+{
+    if (fileName.isEmpty())
+        return;
+    qDebug() << fileName;
+}
+
 void PreviewReportWidget::saveToFile()
 {
     bool saved = false;

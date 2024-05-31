@@ -55,10 +55,12 @@ public slots:
     void print();
     void printToPDF();
     void pageNavigatorChanged(int value);
+    void loadFromFile(QString &fileName); // add by hwf
     void saveToFile();
     void setScalePercent(int percent);
     void fitWidth();
     void fitPage();
+
 protected:
     void resizeEvent(QResizeEvent *);
 signals:

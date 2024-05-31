@@ -1101,4 +1101,44 @@ void PageItemDesignIntf::setMixWithPriorPage(bool value)
 
 }
 
+bool PageItemDesignIntf::thickBorder() const
+{
+    return m_thickBorder;
 }
+
+void PageItemDesignIntf::setThickBorder(bool value)
+{
+    m_thickBorder = value;
+}
+
+bool PageItemDesignIntf::fillFullPaper() const
+{
+    return m_fillFullPaper;
+}
+
+void PageItemDesignIntf::setFillFullPaper(bool value)
+{
+    m_fillFullPaper = value;
+}
+
+QString PageItemDesignIntf::blankRowRefBand() const
+{
+    return m_blankRowRefBand;
+}
+
+void PageItemDesignIntf::setBlankRowRefBand(const QString &value)
+{
+    m_blankRowRefBand = value;
+}
+
+QString PageItemDesignIntf::blankRowInsertPosition() const
+{
+    return m_blankRowInsertPosition;
+}
+
+void PageItemDesignIntf::setBlankRowInsertPosition(const QString &value)
+{
+    m_blankRowInsertPosition = value;
+}
+
+} // namespace LimeReport

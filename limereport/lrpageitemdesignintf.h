@@ -64,7 +64,13 @@ class LIMEREPORT_EXPORT PageItemDesignIntf : public ItemsContainerDesignInft
     Q_PROPERTY(bool dropPrinterMargins READ dropPrinterMargins WRITE setDropPrinterMargins)
     Q_PROPERTY(bool notPrintIfEmpty READ notPrintIfEmpty WRITE setNotPrintIfEmpty)
     Q_PROPERTY(bool mixWithPriorPage READ mixWithPriorPage WRITE setMixWithPriorPage)
+    Q_PROPERTY(bool thickBorder READ thickBorder WRITE setThickBorder)                // add by hwf
+    Q_PROPERTY(bool fillFullPaper READ fillFullPaper WRITE setFillFullPaper)          // add by hwf
+    Q_PROPERTY(QString blankRowRefBand READ blankRowRefBand WRITE setBlankRowRefBand) // add by hwf
+    Q_PROPERTY(QString blankRowInsertPosition READ blankRowInsertPosition WRITE
+                   setBlankRowInsertPosition) // add by hwf
     friend class ReportRender;
+
 public:
 #if (QT_VERSION < QT_VERSION_CHECK(5, 15, 1))
     enum Orientation { Portrait = QPrinter::Portrait, Landscape = QPrinter::Landscape };
@@ -212,6 +218,22 @@ public:
     bool mixWithPriorPage() const;
     void setMixWithPriorPage(bool value);
 
+    // add by hwf
+    bool thickBorder() const;
+    void setThickBorder(bool value);
+
+    // add by hwf
+    bool fillFullPaper() const;
+    void setFillFullPaper(bool value);
+
+    // add by hwf
+    QString blankRowRefBand() const;
+    void setBlankRowRefBand(const QString &value);
+
+    // add by hwf
+    QString blankRowInsertPosition() const;
+    void setBlankRowInsertPosition(const QString &value);
+
 signals:
     void beforeFirstPageRendered();
     void afterLastPageRendered();
@@ -258,8 +280,10 @@ private:
     bool m_dropPrinterMargins;
     bool m_notPrintIfEmpty;
     bool m_mixWithPriorPage;
-
-
+    bool m_thickBorder;               // add by hwf
+    bool m_fillFullPaper;             // add by hwf
+    QString m_blankRowRefBand;        // add by hwf
+    QString m_blankRowInsertPosition; // add by hwf
 };
 
 typedef QList<PageItemDesignIntf::Ptr> ReportPages;
