@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+注：每个nodeCategory下tableName必须唯一，不可重复
+
+tableType = 1：tableName 为报表中数据集名称，根据 variable 取对应数据集
+tableType = 2：tableName 为报表中数据集名称，工料汇总数据集
+tableType = 3：tableName 为报表中数据集名称，计日工拆分3个数据集，根据 variable 定位对应变量，取其所有子结点
+tableType = 4：tableName 为报表中数据集名称， 措施项目拆分2个数据集，根据 variable 定位对应费用类型，取其所有子结点
+tableType > 100：大于100均为自定义数据集类别，一个类别对应不同的数据处理
+	tableType = 101：工程项目费用汇总
+
+filterType = 1：分部分项过滤
+filterType = 2：组织措施过滤
+filterType = 3：费用表过滤
+filterType = 4：工料汇总过滤
+-->
+<DataSource version="1.0">
+	<nodeCategory nodeType="0" remark="整体工程">
+		<table tableName="JBXX" caption="基本信息" tableType="1" variable="xmxx">
+			<columns>
+				<column columnName="mc" columnCaption="名称" columnType="TEXT" sourceColumn="mc"/>
+				<column columnName="nr" columnCaption="内容" columnType="TEXT" sourceColumn="nr"/>
+				<column columnName="dm" columnCaption="代码" columnType="TEXT" sourceColumn="dm"/>
+				<column columnName="lx" columnCaption="类型" columnType="INTEGER" sourceColumn="lx"/>
+				<column columnName="bz" columnCaption="备注" columnType="TEXT" sourceColumn="bz"/>
+			</columns>
+		</table>
+		<table tableName="PRJFEE" caption="工程项目费用汇总" tableType="101">
+			<columns>
+				<column columnName="xh" columnCaption="序号" columnType="TEXT"/>
+				<column columnName="mc" columnCaption="名称" columnType="TEXT"/>
+				<column columnName="lb" columnCaption="类别" columnType="INTEGER"/>
+				<column columnName="je" columnCaption="金额" columnType="DOUBLE"/>
+				<column columnName="zgj" columnCaption="暂估价" columnType="DOUBLE"/>
+				<column columnName="aqwm" columnCaption="安全文明施工费" columnType="DOUBLE"/>
+				<column columnName="gf" columnCaption="规费" columnType="DOUBLE"/>
+				<column columnName="sj" columnCaption="税金" columnType="DOUBLE"/>
+				<column columnName="bz" columnCaption="备注" columnType="DOUBLE"/>
+				<column columnName="dh_bl_fieldName" columnCaption="代号（定位表）_变量（定位行）_字段（定位列）进行分隔的取值" columnType="DOUBLE"/>
+			</columns>
+		</table>
+	</nodeCategory>
+	<nodeCategory nodeType="1" remark="单项工程">
+		<table tableName="JBXX" caption="基本信息" tableType="1" variable="xmxx">
+			<columns>
+				<column columnName="mc" columnCaption="名称" columnType="TEXT" sourceColumn="mc"/>
+				<column columnName="nr" columnCaption="内容" columnType="TEXT" sourceColumn="nr"/>
+				<column columnName="dm" columnCaption="代码" columnType="TEXT" sourceColumn="dm"/>
+				<column columnName="lx" columnCaption="类型" columnType="INTEGER" sourceColumn="lx"/>
+				<column columnName="bz" columnCaption="备注" columnType="TEXT" sourceColumn="bz"/>
+			</columns>
+		</table>
+	</nodeCategory>
+	<nodeCategory nodeType="2" remark="单位工程">
+		<table tableName="JBXX" caption="基本信息" tableType="1" variable="xmxx">
+			<columns>
+				<column columnName="mc" columnCaption="名称" columnType="TEXT" sourceColumn="mc"/>
+				<column columnName="nr" columnCaption="内容" columnType="TEXT" sourceColumn="nr"/>
+				<column columnName="dm" columnCaption="代码" columnType="TEXT" sourceColumn="dm"/>
+				<column columnName="lx" columnCaption="类型" columnType="INTEGER" sourceColumn="lx"/>
+				<column columnName="bz" columnCaption="备注" columnType="TEXT" sourceColumn="bz"/>
+			</columns>
+		</table>
+		<table tableName="FBFX" caption="分部分项" tableType="1" variable="fbfx" filterType="1">
+			<columns>
+			</columns>
+		</table>
+		<table tableName="JSCS" caption="技术措施" tableType="4" variable="jscs" filterType="1">
+			<columns>
+			</columns>
+		</table>
+		<table tableName="ZZCS" caption="组织措施" tableType="4" variable="zzcs" filterType="2">
+			<columns>
+			</columns>
+		</table>
+		<table tableName="QTXM" caption="其他项目" tableType="1" variable="qtxm" filterType="3">
+			<columns>
+				<column columnName="xh" columnCaption="序号" columnType="TEXT" sourceColumn="xh"/>
+				<column columnName="mc" columnCaption="名称" columnType="TEXT" sourceColumn="mc"/>
+				<column columnName="dw" columnCaption="单位" columnType="TEXT" sourceColumn="dw"/>
+				<column columnName="jss" columnCaption="计算式" columnType="TEXT" sourceColumn="jss"/>
+				<column columnName="jssvalue" columnCaption="计算式值" columnType="TEXT" sourceColumn="jssvalue"/>
+				<column columnName="fl" columnCaption="费率" columnType="DOUBLE" sourceColumn="fl"/>
+				<column columnName="dj" columnCaption="单价" columnType="DOUBLE" sourceColumn="dj"/>
+				<column columnName="hj" columnCaption="合价" columnType="DOUBLE" sourceColumn="hj"/>
+				<column columnName="bl" columnCaption="变量" columnType="TEXT" sourceColumn="bl"/>
+				<column columnName="bz" columnCaption="备注" columnType="TEXT" sourceColumn="bz"/>
+				<column columnName="idxcode" columnCaption="工程内容" columnType="TEXT" sourceColumn="idxcode"/>
+				<column columnName="dyxh" columnCaption="打印序号" columnType="TEXT" sourceColumn="dyxh"/>				
+				<column columnName="dyjss" columnCaption="打印计算式" columnType="TEXT" sourceColumn="dyjss"/>
+				<column columnName="bbbl" columnCaption="报表变量" columnType="TEXT" sourceColumn="bbbl"/>
+				<column columnName="sc" columnCaption="输出" columnType="INTEGER" sourceColumn="sc"/>
+			</columns>
+		</table>
+		<table tableName="GCZJ" caption="工程造价" tableType="1" variable="gczj" filterType="3">
+			<columns>
+				<column columnName="xh" columnCaption="序号" columnType="TEXT" sourceColumn="xh"/>
+				<column columnName="mc" columnCaption="名称" columnType="TEXT" sourceColumn="mc"/>
+				<column columnName="dw" columnCaption="单位" columnType="TEXT" sourceColumn="dw"/>
+				<column columnName="jss" columnCaption="计算式" columnType="TEXT" sourceColumn="jss"/>
+				<column columnName="jssvalue" columnCaption="计算式值" columnType="TEXT" sourceColumn="jssvalue"/>
+				<column columnName="fl" columnCaption="费率" columnType="DOUBLE" sourceColumn="fl"/>
+				<column columnName="dj" columnCaption="单价" columnType="DOUBLE" sourceColumn="dj"/>
+				<column columnName="hj" columnCaption="合价" columnType="DOUBLE" sourceColumn="hj"/>
+				<column columnName="bl" columnCaption="变量" columnType="TEXT" sourceColumn="bl"/>
+				<column columnName="bz" columnCaption="备注" columnType="TEXT" sourceColumn="bz"/>
+				<column columnName="idxcode" columnCaption="工程内容" columnType="TEXT" sourceColumn="idxcode"/>
+				<column columnName="dyxh" columnCaption="打印序号" columnType="TEXT" sourceColumn="dyxh"/>				
+				<column columnName="dyjss" columnCaption="打印计算式" columnType="TEXT" sourceColumn="dyjss"/>
+				<column columnName="bbbl" columnCaption="报表变量" columnType="TEXT" sourceColumn="bbbl"/>
+				<column columnName="sc" columnCaption="输出" columnType="INTEGER" sourceColumn="sc"/>
+			</columns>
+		</table>		
+		<table tableName="JRGRG" caption="计日工人工" tableType="3" variable="P_rg" filterType="3">
+			<columns>
+				<column columnName="xh" columnCaption="序号" columnType="TEXT" sourceColumn="xh"/>
+				<column columnName="mc" columnCaption="名称" columnType="TEXT" sourceColumn="mc"/>
+				<column columnName="dw" columnCaption="单位" columnType="TEXT" sourceColumn="dw"/>
+				<column columnName="jss" columnCaption="计算式" columnType="TEXT" sourceColumn="jss"/>
+				<column columnName="jssvalue" columnCaption="计算式值" columnType="TEXT" sourceColumn="jssvalue"/>
+				<column columnName="fl" columnCaption="费率" columnType="DOUBLE" sourceColumn="fl"/>
+				<column columnName="dj" columnCaption="单价" columnType="DOUBLE" sourceColumn="dj"/>
+				<column columnName="hj" columnCaption="合价" columnType="DOUBLE" sourceColumn="hj"/>
+				<column columnName="bl" columnCaption="变量" columnType="TEXT" sourceColumn="bl"/>
+				<column columnName="bz" columnCaption="备注" columnType="TEXT" sourceColumn="bz"/>
+				<column columnName="idxcode" columnCaption="工程内容" columnType="TEXT" sourceColumn="idxcode"/>
+				<column columnName="dyxh" columnCaption="打印序号" columnType="TEXT" sourceColumn="dyxh"/>				
+				<column columnName="dyjss" columnCaption="打印计算式" columnType="TEXT" sourceColumn="dyjss"/>
+				<column columnName="bbbl" columnCaption="报表变量" columnType="TEXT" sourceColumn="bbbl"/>
+				<column columnName="sc" columnCaption="输出" columnType="INTEGER" sourceColumn="sc"/>
+			</columns>
+		</table>
+		<table tableName="JRGCL" caption="计日工材料" tableType="3" variable="P_cl" filterType="3">
+			<columns>
+				<column columnName="xh" columnCaption="序号" columnType="TEXT" sourceColumn="xh"/>
+				<column columnName="mc" columnCaption="名称" columnType="TEXT" sourceColumn="mc"/>
+				<column columnName="dw" columnCaption="单位" columnType="TEXT" sourceColumn="dw"/>
+				<column columnName="jss" columnCaption="计算式" columnType="TEXT" sourceColumn="jss"/>
+				<column columnName="jssvalue" columnCaption="计算式值" columnType="TEXT" sourceColumn="jssvalue"/>
+				<column columnName="fl" columnCaption="费率" columnType="DOUBLE" sourceColumn="fl"/>
+				<column columnName="dj" columnCaption="单价" columnType="DOUBLE" sourceColumn="dj"/>
+				<column columnName="hj" columnCaption="合价" columnType="DOUBLE" sourceColumn="hj"/>
+				<column columnName="bl" columnCaption="变量" columnType="TEXT" sourceColumn="bl"/>
+				<column columnName="bz" columnCaption="备注" columnType="TEXT" sourceColumn="bz"/>
+				<column columnName="idxcode" columnCaption="工程内容" columnType="TEXT" sourceColumn="idxcode"/>
+				<column columnName="dyxh" columnCaption="打印序号" columnType="TEXT" sourceColumn="dyxh"/>				
+				<column columnName="dyjss" columnCaption="打印计算式" columnType="TEXT" sourceColumn="dyjss"/>
+				<column columnName="bbbl" columnCaption="报表变量" columnType="TEXT" sourceColumn="bbbl"/>
+				<column columnName="sc" columnCaption="输出" columnType="INTEGER" sourceColumn="sc"/>
+			</columns>
+		</table>
+		<table tableName="JRGJX" caption="计日工机械" tableType="3" variable="P_jx" filterType="3">
+			<columns>
+				<column columnName="xh" columnCaption="序号" columnType="TEXT" sourceColumn="xh"/>
+				<column columnName="mc" columnCaption="名称" columnType="TEXT" sourceColumn="mc"/>
+				<column columnName="dw" columnCaption="单位" columnType="TEXT" sourceColumn="dw"/>
+				<column columnName="jss" columnCaption="计算式" columnType="TEXT" sourceColumn="jss"/>
+				<column columnName="jssvalue" columnCaption="计算式值" columnType="TEXT" sourceColumn="jssvalue"/>
+				<column columnName="fl" columnCaption="费率" columnType="DOUBLE" sourceColumn="fl"/>
+				<column columnName="dj" columnCaption="单价" columnType="DOUBLE" sourceColumn="dj"/>
+				<column columnName="hj" columnCaption="合价" columnType="DOUBLE" sourceColumn="hj"/>
+				<column columnName="bl" columnCaption="变量" columnType="TEXT" sourceColumn="bl"/>
+				<column columnName="bz" columnCaption="备注" columnType="TEXT" sourceColumn="bz"/>
+				<column columnName="idxcode" columnCaption="工程内容" columnType="TEXT" sourceColumn="idxcode"/>
+				<column columnName="dyxh" columnCaption="打印序号" columnType="TEXT" sourceColumn="dyxh"/>				
+				<column columnName="dyjss" columnCaption="打印计算式" columnType="TEXT" sourceColumn="dyjss"/>
+				<column columnName="bbbl" columnCaption="报表变量" columnType="TEXT" sourceColumn="bbbl"/>
+				<column columnName="sc" columnCaption="输出" columnType="INTEGER" sourceColumn="sc"/>
+			</columns>
+		</table>						
+		<table tableName="GLHZ" caption="工料汇总" tableType="2" filterType="4">
+			<columns>
+			</columns>		
+		</table>
+	</nodeCategory>	
+</DataSource>

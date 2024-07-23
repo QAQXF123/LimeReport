@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/toolsIcon">
+        <file>res/main_new.png</file>
+        <file>res/main_open.png</file>
+        <file>res/main_save.png</file>
+    </qresource>
+</RCC>
