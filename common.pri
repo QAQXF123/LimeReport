@@ -2,7 +2,7 @@
 #CONFIG += no_build_translations
 
 # uncomment to disable zint
-#CONFIG += no_zint
+CONFIG += no_zint
 
 # uncomment to disable svg
 #CONFIG += no_svg
