@@ -1,5 +1,5 @@
 # uncomment to disable translations
-#CONFIG += no_build_translations
+CONFIG += no_build_translations
 
 # uncomment to disable zint
 CONFIG += no_zint
