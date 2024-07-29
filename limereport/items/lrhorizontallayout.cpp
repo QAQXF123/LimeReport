@@ -238,16 +238,4 @@ void HorizontalLayout::placeItemInLayout(BaseDesignIntf* item)
         item->setPos(0, 0);
 }
 
-void HorizontalLayout::insertItemInLayout(BaseDesignIntf* item)
-{
-    foreach (BaseDesignIntf* child, childBaseItems()) {
-        if (child->pos() == item->pos()){
-            int index = layoutsChildren().indexOf(child)-1;
-            layoutsChildren().insert(index, item);
-            child->setPos(item->pos().x()+item->width(), 0);
-            break;
-        }
-    }
-}
-
 } // namespace LimeReport

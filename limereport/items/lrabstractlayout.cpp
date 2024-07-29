@@ -48,7 +48,8 @@ void AbstractLayout::setLayoutType(const LayoutType& layoutType)
 
 void AbstractLayout::addChild(BaseDesignIntf* item, bool updateSize)
 {
-    placeItemInLayout(item);
+    if (updateSize)
+        placeItemInLayout(item);
 
     m_children.append(item);
     item->setParentItem(this);
