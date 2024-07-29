@@ -321,6 +321,19 @@ BaseDesignIntf *AbstractLayout::findPrior(BaseDesignIntf *item)
     return 0;
 }
 
+void AbstractLayout::insertItemInLayout(BaseDesignIntf *item){
+    bool inserted = false;
+    for (int i=0; i<layoutsChildren().length(); ++i){
+        BaseDesignIntf* child = layoutsChildren()[i];
+        if (child->pos() == item->pos()){
+            layoutsChildren().insert(i, item);
+            inserted = true;
+            break;
+        }
+    }
+    if (!inserted) layoutsChildren().append(item);
+}
+
 void AbstractLayout::slotOnChildDestroy(QObject* child)
 {
     m_children.removeAll(static_cast<BaseDesignIntf*>(child));
