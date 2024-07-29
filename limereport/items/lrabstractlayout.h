@@ -55,6 +55,8 @@ protected:
     void rebuildChildrenIfNeeded();
     void connectToLayout(BaseDesignIntf* item);
     void disconnectFromLayout(BaseDesignIntf* item);
+    virtual void insertItemInLayout(BaseDesignIntf *item);
+
 private:
     virtual void sortChildren() = 0;
     virtual void divideSpace() = 0;
@@ -63,7 +65,6 @@ private:
     virtual BaseDesignIntf* findNext(BaseDesignIntf *item);
     virtual BaseDesignIntf* findPrior(BaseDesignIntf *item);
     virtual void placeItemInLayout(BaseDesignIntf* item) = 0;
-    virtual void insertItemInLayout(BaseDesignIntf* item) = 0;
 private slots:
     void slotOnChildDestroy(QObject *child);
     void slotOnChildGeometryChanged(QObject*item, QRectF newGeometry, QRectF oldGeometry);
