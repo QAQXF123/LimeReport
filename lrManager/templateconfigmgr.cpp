@@ -55,8 +55,8 @@ void SpecialMgr::loadData(QDomElement &specialsNode)
         QDomNodeList reports = node.childNodes();
         for (int j = 0; j < reports.size(); j++) {
             QDomElement report = reports.item(j).toElement();
-            specialItem->append(report.attribute("reportId").toInt(),
-                                report.attribute("categoryId").toInt(),
+            specialItem->append(report.attribute("categoryId").toInt(),
+                                report.attribute("reportId").toInt(),
                                 report.attribute("reportName"));
         }
     }
