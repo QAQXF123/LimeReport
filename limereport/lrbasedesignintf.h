@@ -297,9 +297,7 @@ public:
     int possibleMoveDirectionFlags() const;
     void setPossibleMoveFlags(int directionsFlags);
 
-    int marginSize() const {
-        return m_margin + m_reportSettings != 0 ? m_reportSettings->baseItemPadding() : 0;
-    }
+    int marginSize() const;
     void setMarginSize(int value);
 
     QString itemTypeName() const;
@@ -456,7 +454,7 @@ private:
     QFont   m_font;
     QColor  m_fontColor;
     bool    m_fixedPos;
-    qreal     m_borderLineSize;
+    qreal   m_borderLineSize;
 
 
     QRectF  m_rect;
