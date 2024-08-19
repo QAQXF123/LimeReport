@@ -361,6 +361,7 @@ public:
     Q_INVOKABLE QVariant cnNO(QVariant value);                   // add by hwf
     Q_INVOKABLE QVariant CNYBig(QVariant value, int digit = -2); // add by hwf
     Q_INVOKABLE QVariant round(QVariant value, int digit = -2);  // add by hwf
+    Q_INVOKABLE QVariant cnNYR(QVariant value);                  // add by hwf
     Q_INVOKABLE QVariant dateFormat(QVariant value, const QString& format, const QString& locale);
     Q_INVOKABLE QVariant timeFormat(QVariant value, const QString& format);
     Q_INVOKABLE QVariant dateTimeFormat(QVariant value, const QString& format, const QString& locale);
@@ -531,6 +532,7 @@ private:
     bool createCNNOFunction();   // add by hwf
     bool createCNYBigFunction(); // add by hwf
     bool createRoundFunction();  // add by hwf
+    bool createCNNYRFunction();  // add by hwf
     bool createDateFormatFunction();
     bool createTimeFormatFunction();
     bool createDateTimeFormatFunction();

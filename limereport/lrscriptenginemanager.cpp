@@ -831,6 +831,21 @@ bool ScriptEngineManager::createRoundFunction()
     return addFunction(fd);
 }
 
+bool ScriptEngineManager::createCNNYRFunction()
+{
+    JSFunctionDesc fd;
+
+    fd.setManager(m_functionManager);
+    fd.setManagerName(LimeReport::Const::FUNCTION_MANAGER_NAME);
+    fd.setCategory(tr("NUMBER"));
+    fd.setName("cnNYR");
+    fd.setDescription("cnNYR(\"" + tr("Value") + "\")");
+    fd.setScriptWrapper(QString("function cnNYR(value){"
+                                "return %1.cnNYR(value);}")
+                            .arg(LimeReport::Const::FUNCTION_MANAGER_NAME));
+    return addFunction(fd);
+}
+
 bool ScriptEngineManager::createDateFormatFunction(){
     JSFunctionDesc fd;
 
@@ -1208,6 +1223,7 @@ ScriptEngineManager::ScriptEngineManager()
     createCNNOFunction();  // add by hwf
     createCNYBigFunction(); // add by hwf
     createRoundFunction(); // add by hwf
+    createCNNYRFunction(); // add by hwf
     createDateFormatFunction();
     createTimeFormatFunction();
     createDateTimeFormatFunction();
@@ -1979,6 +1995,21 @@ QVariant ScriptFunctionsManager::round(QVariant value, int digit)
         iBit = 0;
     }
     return QString::number(d, 'f', iBit);
+}
+
+QVariant ScriptFunctionsManager::cnNYR(QVariant value)
+{
+    QString dateStr = value.toString();
+    if (dateStr.isEmpty())
+        return "";
+    if (dateStr.contains("年") || dateStr.contains("月") || dateStr.contains("日"))
+        return dateStr;
+    else {
+        QStringList list = dateStr.split(QRegExp("[-./]"));
+        if (list.size() < 3)
+            return "";
+        return list.at(0) + "年" + list.at(1) + "月" + list.at(2) + "日";
+    }
 }
 
 QVariant ScriptFunctionsManager::dateFormat(QVariant value, const QString &format, const QString& locale)
