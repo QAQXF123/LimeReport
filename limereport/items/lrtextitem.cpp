@@ -57,9 +57,19 @@ bool VARIABLE_IS_NOT_USED registred = LimeReport::DesignElementsFactory::instanc
 namespace LimeReport{
 
 TextItem::TextItem(QObject *owner, QGraphicsItem *parent)
-    : ContentItemDesignIntf(xmlTag,owner,parent), m_angle(Angle0), m_trimValue(true), m_allowHTML(false),
-      m_allowHTMLInFields(false), m_replaceCarriageReturns(false), m_followTo(""), m_follower(0), m_textIndent(0),
-      m_textLayoutDirection(Qt::LayoutDirectionAuto), m_hideIfEmpty(false), m_fontLetterSpacing(0)
+    : ContentItemDesignIntf(xmlTag, owner, parent)
+    , m_angle(Angle0)
+    , m_trimValue(true)
+    , m_allowHTML(false)
+    , m_allowHTMLInFields(false)
+    , m_replaceCarriageReturns(false)
+    , m_followTo("")
+    , m_follower(0)
+    , m_textIndent(0)
+    , m_textLayoutDirection(Qt::LayoutDirectionAuto)
+    , m_hideIfEmpty(false)
+    , m_fontLetterSpacing(0)
+    , m_hideZeroValue(false)
 {
     PageItemDesignIntf* pageItem = dynamic_cast<PageItemDesignIntf*>(parent);
     BaseDesignIntf* parentItem = dynamic_cast<BaseDesignIntf*>(parent);
@@ -113,6 +123,9 @@ void TextItem::preparePopUpMenu(QMenu &menu)
     action->setCheckable(true);
     action->setChecked(hideIfEmpty());
 
+    action = menu.addAction(tr("Hide zero value"));
+    action->setCheckable(true);
+    action->setChecked(hideZeroValue());
 }
 
 void TextItem::processPopUpAction(QAction *action)
@@ -145,8 +158,13 @@ void TextItem::processPopUpAction(QAction *action)
         page()->setPropertyToSelectedItems("watermark",action->isChecked());
     }
 
-    if (action->text().compare(tr("Hide if empty")) == 0){
-        page()->setPropertyToSelectedItems("hideIfEmpty",action->isChecked());
+    // add by hwf
+    // if (action->text().compare(tr("Hide if empty")) == 0){
+    //     page()->setPropertyToSelectedItems("hideIfEmpty",action->isChecked());
+    // }
+
+    if (action->text().compare(tr("Hide zero value")) == 0) {
+        page()->setPropertyToSelectedItems("hideZeroValue", action->isChecked());
     }
 
     ContentItemDesignIntf::processPopUpAction(action);
@@ -285,6 +303,7 @@ void TextItem::Init()
     m_underlineLineSize = 1;
     m_lineSpacing = 1;
     m_valueType = Default;
+    m_hideZeroValue = false;
 }
 
 void TextItem::setContent(const QString &value)
@@ -329,7 +348,7 @@ void TextItem::updateItemSize(DataSourceManager* dataManager, RenderPass pass, i
         }
     }
     BaseDesignIntf::updateItemSize(dataManager, pass, maxHeight);
-    if (isEmpty() && hideIfEmpty()) setVisible(false);
+    // if (isEmpty() && hideIfEmpty()) setVisible(false);  // add by hwf
 }
 
 void TextItem::updateLayout()
@@ -442,70 +461,123 @@ QString TextItem::formatDateTime(const QDateTime &value)
 
 QString TextItem::formatNumber(const double value)
 {
-    QString str = QString::number(value);
-
-    if (m_format.contains("%"))
-    {
-#if QT_VERSION < 0x050500
-        str.sprintf(m_format.toStdString().c_str(), value);
-#else
-        str.asprintf(m_format.toStdString().c_str(), value);
-#endif
-        str = str.replace(",", QLocale::system().groupSeparator());
-        str = str.replace(".", QLocale::system().decimalPoint());
+    // add by hwf
+    int digit = 0;         // 取整
+    bool bfixZero = false; // 是否补0
+    if (m_format.contains('.')) {
+        // .00000\.#####：补0、不补0看小数点后第一位，保留位数为小数点后0或#个数
+        int dotPos = m_format.indexOf('.');
+        QString precision = m_format.right(m_format.length() - dotPos - 1);
+        bfixZero = precision.startsWith('0');
+        digit = (bfixZero ? precision.count('0') : precision.count('#')) * -1;
     }
-
+    double dV;
+    double lp = qPow(10.0, digit);
+    if (value < 0)
+        dV = ceil(value / lp - 0.500000001) * lp;
+    else
+        dV = floor(value / lp + 0.500000001) * lp;
+    // 隐藏0值
+    if (m_hideZeroValue && qFuzzyIsNull(dV))
+        return "";
+    QString str = QString::number(dV, 'f', qAbs(digit));
+    // 尾部不补0时
+    if (!bfixZero && (digit != 0)) {
+        while (str.endsWith('0')) {
+            str.chop(1);
+            if (str.endsWith(".")) {
+                str.chop(1);
+                break;
+            }
+        }
+    }
     return str;
+    //     QString str = QString::number(value);
+
+    //     if (m_format.contains("%"))
+    //     {
+    // #if QT_VERSION < 0x050500
+    //         str.sprintf(m_format.toStdString().c_str(), value);
+    // #else
+    //         str.asprintf(m_format.toStdString().c_str(), value);
+    // #endif
+    //         str = str.replace(",", QLocale::system().groupSeparator());
+    //         str = str.replace(".", QLocale::system().decimalPoint());
+    //     }
+
+    //     return str;
 }
 
 QString TextItem::formatFieldValue()
 {
     if (m_format.isEmpty()) {
+        // add by hwf:防止显示成科学计数法的问题
+        if (m_valueType == Double) {
+            bool bOK = false;
+            QString str = QString::number(m_varValue.toDouble(&bOK), 'f', 8);
+            if (bOK && str.contains('.')) {
+                while (str.endsWith('0')) {
+                    str.chop(1);
+                    if (str.endsWith('.')) {
+                        str.chop(1);
+                        break;
+                    }
+                }
+                return str;
+            }
+        }
         return m_varValue.toString();
     }
-
-    QVariant value = m_varValue;
-
-    if (m_valueType != Default) {
-        switch (m_valueType) {
-        case DateTime:
-            {
-                QDateTime dt = QDateTime::fromString(value.toString(), Qt::ISODate);
-                value = (dt.isValid() ? QVariant(dt) : m_varValue);
-                break;
-            }
-        case Double:
-            {
-                bool bOk = false;
-                double dbl = value.toDouble(&bOk);
-                value = (bOk ? QVariant(dbl) : m_varValue);
-            }
-        default: break;
-        }
+    // add by hwf:::只判断Double
+    if (m_valueType == Double) {
+        bool bOK = false;
+        double dVal = m_varValue.toDouble(&bOK);
+        if (bOK)
+            return formatNumber(dVal);
     }
+    return m_varValue.toString();
 
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-    switch (value.type()) {
-        case QVariant::Date:
-        case QVariant::DateTime:
-            return formatDateTime(value.toDateTime());
-        case QVariant::Double:
-            return formatNumber(value.toDouble());
-        default:
-            return value.toString();
-    }
-#else
-    switch (value.typeId()) {
-        case QMetaType::QDate:
-        case QMetaType::QDateTime:
-            return formatDateTime(value.toDateTime());
-        case QMetaType::Double:
-            return formatNumber(value.toDouble());
-        default:
-            return value.toString();
-    }
-#endif
+    //     QVariant value = m_varValue;
 
+    //     if (m_valueType != Default) {
+    //         switch (m_valueType) {
+    //         case DateTime:
+    //             {
+    //                 QDateTime dt = QDateTime::fromString(value.toString(), Qt::ISODate);
+    //                 value = (dt.isValid() ? QVariant(dt) : m_varValue);
+    //                 break;
+    //             }
+    //         case Double:
+    //             {
+    //                 bool bOk = false;
+    //                 double dbl = value.toDouble(&bOk);
+    //                 value = (bOk ? QVariant(dbl) : m_varValue);
+    //             }
+    //         default: break;
+    //         }
+    //     }
+
+    // #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    //     switch (value.type()) {
+    //         case QVariant::Date:
+    //         case QVariant::DateTime:
+    //             return formatDateTime(value.toDateTime());
+    //         case QVariant::Double:
+    //             return formatNumber(value.toDouble());
+    //         default:
+    //             return value.toString();
+    //     }
+    // #else
+    //     switch (value.typeId()) {
+    //         case QMetaType::QDate:
+    //         case QMetaType::QDateTime:
+    //             return formatDateTime(value.toDateTime());
+    //         case QMetaType::Double:
+    //             return formatNumber(value.toDouble());
+    //         default:
+    //             return value.toString();
+    //     }
+    // #endif
 }
 
 TextItem::TextPtr TextItem::textDocument() const
@@ -580,6 +652,16 @@ void TextItem::setFontLetterSpacing(int value)
         setFont(curFont);
         notify("fontLetterSpacing", oldValue, value);
     }
+}
+
+bool TextItem::hideZeroValue() const
+{
+    return m_hideZeroValue;
+}
+
+void TextItem::setHideZeroValue(bool hideZeroValue)
+{
+    m_hideZeroValue = hideZeroValue;
 }
 
 bool TextItem::hideIfEmpty() const

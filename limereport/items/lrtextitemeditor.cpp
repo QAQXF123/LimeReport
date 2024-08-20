@@ -108,7 +108,7 @@ void TextItemEditor::closeEvent(QCloseEvent* event)
 
 void TextItemEditor::on_pbOk_clicked()
 {
-    if (m_textItem->content()!= ui->codeEditor->toPlainText()){
+    if (m_textItem->content() != ui->codeEditor->toPlainText()) {
         m_textItem->setContent(ui->codeEditor->toPlainText());
     }
     close();

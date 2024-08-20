@@ -74,6 +74,7 @@ class TextItem : public ContentItemDesignIntf, IPageInit {
     Q_PROPERTY(bool replaceCRwithBR READ isReplaceCarriageReturns WRITE setReplaceCarriageReturns)
     Q_PROPERTY(bool hideIfEmpty READ hideIfEmpty WRITE setHideIfEmpty)
     Q_PROPERTY(int fontLetterSpacing READ fontLetterSpacing WRITE setFontLetterSpacing)
+    Q_PROPERTY(bool hideZeroValue READ hideZeroValue WRITE setHideZeroValue)
 public:
 
     enum AutoWidth{NoneAutoWidth, MaxWordLength, MaxStringLength};
@@ -116,7 +117,7 @@ public:
 
     bool canBeSplitted(int height) const;
     bool isSplittable() const { return true;}
-    bool isEmpty() const{return m_strText.trimmed().isEmpty();}
+    bool isEmpty() const { return false; } //by hwf return m_strText.trimmed().isEmpty();
     BaseDesignIntf* cloneUpperPart(int height, QObject *owner, QGraphicsItem *parent);
     BaseDesignIntf* cloneBottomPart(int height, QObject *owner, QGraphicsItem *parent);
     BaseDesignIntf* createSameTypeItem(QObject* owner=0, QGraphicsItem* parent=0);
@@ -187,6 +188,9 @@ public:
     int fontLetterSpacing() const;
     void setFontLetterSpacing(int fontLetterSpacing);
 
+    bool hideZeroValue() const;                // add by hwf
+    void setHideZeroValue(bool hideZeroValue); // add by hwf
+
 protected:
     void updateLayout();
     bool isNeedExpandContent() const;
@@ -231,6 +235,7 @@ private:
     Qt::LayoutDirection m_textLayoutDirection;
     bool m_hideIfEmpty;
     int m_fontLetterSpacing;
+    bool m_hideZeroValue; // add by hwf
 };
 
 }

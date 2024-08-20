@@ -96,7 +96,6 @@ class LIMEREPORT_EXPORT BaseDesignIntf :
     Q_PROPERTY(QColor borderColor READ borderColor WRITE setBorderColor)
     Q_PROPERTY(bool geometryLocked READ isGeometryLocked WRITE setGeometryLocked)
     Q_PROPERTY(BorderStyle borderStyle READ borderStyle WRITE setBorderStyle)
-    Q_PROPERTY(bool hideZeroValue READ hideZeroValue WRITE setHideZeroValue) // add by hwf
 
     friend class ReportRender;
 
@@ -344,10 +343,6 @@ public:
     bool hasShadow();
     void setShadow(bool sh);
 
-    // add by hwf
-    bool hideZeroValue();
-    void setHideZeroValue(bool value);
-
     Q_INVOKABLE QString setItemWidth(qreal width);
     Q_INVOKABLE QString setItemHeight(qreal height);
     Q_INVOKABLE qreal getItemWidth();
@@ -502,8 +497,6 @@ private:
     bool     m_isChangingPos;
     bool     m_isMoveable;
     bool     m_shadow;
-
-    bool m_hideZeroValue; // add by hwf
 signals:
     void geometryChanged(QObject* object, QRectF newGeometry, QRectF oldGeometry);
     void posChanging(QObject* object, QPointF newPos, QPointF oldPos);
