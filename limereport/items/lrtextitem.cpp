@@ -514,7 +514,7 @@ QString TextItem::formatFieldValue()
         // add by hwf:防止显示成科学计数法的问题
         if (m_valueType == Double) {
             bool bOK = false;
-            QString str = QString::number(m_varValue.toDouble(&bOK), 'f', 8);
+            QString str = QString::number(m_varValue.toDouble(&bOK), 'f', 6);
             if (bOK && str.contains('.')) {
                 while (str.endsWith('0')) {
                     str.chop(1);
