@@ -482,15 +482,8 @@ QString TextItem::formatNumber(const double value)
         return "";
     QString str = QString::number(dV, 'f', qAbs(digit));
     // 尾部不补0时
-    if (!bfixZero && (digit != 0)) {
-        while (str.endsWith('0')) {
-            str.chop(1);
-            if (str.endsWith(".")) {
-                str.chop(1);
-                break;
-            }
-        }
-    }
+    if (!bfixZero && (digit != 0))
+        str = str.replace(QRegExp("(\\.){0,1}0+$"), "");
     return str;
     //     QString str = QString::number(value);
 
@@ -514,15 +507,15 @@ QString TextItem::formatFieldValue()
         // add by hwf:防止显示成科学计数法的问题
         if (m_valueType == Double) {
             bool bOK = false;
-            QString str = QString::number(m_varValue.toDouble(&bOK), 'f', 6);
-            if (bOK && str.contains('.')) {
-                while (str.endsWith('0')) {
-                    str.chop(1);
-                    if (str.endsWith('.')) {
-                        str.chop(1);
-                        break;
-                    }
-                }
+            double dVal = m_varValue.toDouble(&bOK);
+            if (bOK) {
+                if (m_hideZeroValue && qFuzzyIsNull(dVal))
+                    return "";
+                QString str = QString::number(dVal, 'f', 6);
+                if (str.contains('.'))
+                    str = str.replace(QRegExp("(\\.){0,1}0+$"), "");
+                if (m_hideZeroValue && (str == "0"))
+                    return "";
                 return str;
             }
         }
