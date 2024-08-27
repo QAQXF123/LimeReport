@@ -45,15 +45,30 @@ bool bandSortBandLessThenByIndex(const BandDesignIntf *c1, const BandDesignIntf 
     }
 }
 
-PageItemDesignIntf::PageItemDesignIntf(QObject *owner, QGraphicsItem *parent) :
-    ItemsContainerDesignInft("PageItem",owner,parent),
-    m_topMargin(0), m_bottomMargin(0), m_leftMargin(0), m_rightMargin(0),
-    m_pageOrientaion(Portrait), m_pageSize(A4), m_sizeChainging(false),
-    m_fullPage(false), m_oldPrintMode(false), m_resetPageNumber(false),
-    m_isExtendedInDesignMode(false), m_extendedHeight(1000), m_isTOC(false),
-    m_setPageSizeToPrinter(false), m_endlessHeight(false), m_printable(true),
-    m_pageFooter(0), m_printBehavior(Split), m_dropPrinterMargins(false),
-    m_notPrintIfEmpty(false), m_mixWithPriorPage(false)
+PageItemDesignIntf::PageItemDesignIntf(QObject *owner, QGraphicsItem *parent)
+    : ItemsContainerDesignInft("PageItem", owner, parent)
+    , m_topMargin(0)
+    , m_bottomMargin(0)
+    , m_leftMargin(0)
+    , m_rightMargin(0)
+    , m_pageOrientaion(Portrait)
+    , m_pageSize(A4)
+    , m_sizeChainging(false)
+    , m_fullPage(false)
+    , m_oldPrintMode(false)
+    , m_resetPageNumber(false)
+    , m_isExtendedInDesignMode(false)
+    , m_extendedHeight(1000)
+    , m_isTOC(false)
+    , m_setPageSizeToPrinter(false)
+    , m_endlessHeight(false)
+    , m_printable(true)
+    , m_pageFooter(0)
+    , m_pageContentFooter(0)
+    , m_printBehavior(Split)
+    , m_dropPrinterMargins(false)
+    , m_notPrintIfEmpty(false)
+    , m_mixWithPriorPage(false)
 {
     setFixedPos(true);
     setPossibleResizeDirectionFlags(Fixed);
@@ -61,15 +76,33 @@ PageItemDesignIntf::PageItemDesignIntf(QObject *owner, QGraphicsItem *parent) :
     initPageSize(m_pageSize);
 }
 
-PageItemDesignIntf::PageItemDesignIntf(const PageSize pageSize, const QRectF &rect, QObject *owner, QGraphicsItem *parent) :
-    ItemsContainerDesignInft("PageItem",owner,parent),
-    m_topMargin(0), m_bottomMargin(0), m_leftMargin(0), m_rightMargin(0),
-    m_pageOrientaion(Portrait), m_pageSize(pageSize), m_sizeChainging(false),
-    m_fullPage(false), m_oldPrintMode(false), m_resetPageNumber(false),
-    m_isExtendedInDesignMode(false), m_extendedHeight(1000), m_isTOC(false),
-    m_setPageSizeToPrinter(false), m_endlessHeight(false), m_printable(true),
-    m_pageFooter(0), m_printBehavior(Split), m_dropPrinterMargins(false),
-    m_notPrintIfEmpty(false), m_mixWithPriorPage(false)
+PageItemDesignIntf::PageItemDesignIntf(const PageSize pageSize,
+                                       const QRectF &rect,
+                                       QObject *owner,
+                                       QGraphicsItem *parent)
+    : ItemsContainerDesignInft("PageItem", owner, parent)
+    , m_topMargin(0)
+    , m_bottomMargin(0)
+    , m_leftMargin(0)
+    , m_rightMargin(0)
+    , m_pageOrientaion(Portrait)
+    , m_pageSize(pageSize)
+    , m_sizeChainging(false)
+    , m_fullPage(false)
+    , m_oldPrintMode(false)
+    , m_resetPageNumber(false)
+    , m_isExtendedInDesignMode(false)
+    , m_extendedHeight(1000)
+    , m_isTOC(false)
+    , m_setPageSizeToPrinter(false)
+    , m_endlessHeight(false)
+    , m_printable(true)
+    , m_pageFooter(0)
+    , m_pageContentFooter(0)
+    , m_printBehavior(Split)
+    , m_dropPrinterMargins(false)
+    , m_notPrintIfEmpty(false)
+    , m_mixWithPriorPage(false)
 {
     setFixedPos(true);
     setPossibleResizeDirectionFlags(Fixed);
@@ -470,6 +503,16 @@ void PageItemDesignIntf::setPageFooter(BandDesignIntf *pageFooter)
     m_pageFooter = pageFooter;
 }
 
+BandDesignIntf *PageItemDesignIntf::pageContentFooter() const
+{
+    return m_pageContentFooter;
+}
+
+void PageItemDesignIntf::setPageContentFooter(BandDesignIntf *pageContentFooter)
+{
+    m_pageContentFooter = pageContentFooter;
+}
+
 void PageItemDesignIntf::placeTearOffBand()
 {
     BandDesignIntf* tearOffBand = bandByType(BandDesignIntf::TearOffBand);
@@ -545,11 +588,11 @@ void PageItemDesignIntf::relocateBands()
 
     int bandIndex = 0;
     if (!(itemMode() & DesignMode)){
-        while ( (bandIndex < m_bands.count()) &&
-                ((m_bands[bandIndex]->bandType() == BandDesignIntf::TearOffBand) ||
-                (m_bands[bandIndex]->bandType() == BandDesignIntf::PageFooter) ||
-                 m_bands[bandIndex]->bandType() == BandDesignIntf::ReportFooter )
-        ){
+        while ((bandIndex < m_bands.count())
+               && ((m_bands[bandIndex]->bandType() == BandDesignIntf::TearOffBand)
+                   || (m_bands[bandIndex]->bandType() == BandDesignIntf::PageContentFooter)
+                   || (m_bands[bandIndex]->bandType() == BandDesignIntf::PageFooter)
+                   || m_bands[bandIndex]->bandType() == BandDesignIntf::ReportFooter)) {
             bandIndex++;
         }
     }

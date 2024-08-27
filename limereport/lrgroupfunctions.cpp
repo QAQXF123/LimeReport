@@ -63,8 +63,9 @@ void GroupFunction::slotBandRendered(BandDesignIntf *band)
             QString field = matchField.captured(1);
 #endif
             if (m_dataManager->containsField(field)){
-                m_values.push_back(m_dataManager->fieldData(field));
-                m_valuesByBand.insert(band, m_dataManager->fieldData(field));
+                QVariant v = m_dataManager->fieldData(field);
+                m_values.push_back(v);
+                m_valuesByBand.insert(band, v);
             } else {
                 setInvalid(tr("Field \"%1\" not found").arg(m_data));
             }

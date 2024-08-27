@@ -203,7 +203,11 @@ public:
     void placeTearOffBand();
     BandDesignIntf *pageFooter() const;
     void setPageFooter(BandDesignIntf *pageFooter);
-    
+
+    // add by hwf
+    BandDesignIntf *pageContentFooter() const;
+    void setPageContentFooter(BandDesignIntf *pageContentFooter);
+
     PrintBehavior printBehavior() const;
     void setPrintBehavior(const PrintBehavior &printBehavior);
 
@@ -276,6 +280,7 @@ private:
     bool m_printable;
     QString m_printerName;
     BandDesignIntf* m_pageFooter;
+    BandDesignIntf *m_pageContentFooter; // add by hwf
     PrintBehavior m_printBehavior;
     bool m_dropPrinterMargins;
     bool m_notPrintIfEmpty;

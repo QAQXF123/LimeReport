@@ -30,13 +30,14 @@
 #include "lrbandsmanager.h"
 #include "lrglobal.h"
 
-#include "lrpageheader.h"
-#include "lrpagefooter.h"
-#include "lrreportheader.h"
-#include "lrreportfooter.h"
 #include "lrdataband.h"
-#include "lrsubdetailband.h"
 #include "lrgroupbands.h"
+#include "lrpagecontentfooter.h"
+#include "lrpagefooter.h"
+#include "lrpageheader.h"
+#include "lrreportfooter.h"
+#include "lrreportheader.h"
+#include "lrsubdetailband.h"
 #include "lrtearoffband.h"
 
 namespace LimeReport{
@@ -46,9 +47,9 @@ BandsManager::BandsManager(){}
 QStringList BandsManager::bandNames()
 {
     QStringList bandsList;
-    bandsList<<QObject::tr("Report Header")<<QObject::tr("Page Header")
-            <<QObject::tr("Page Footer")<<QObject::tr("Report Footer")
-            <<QObject::tr("Data")<<QObject::tr("SubDetail");
+    bandsList << QObject::tr("Report Header") << QObject::tr("Page Header")
+              << QObject::tr("PageContent Footer") << QObject::tr("Page Footer")
+              << QObject::tr("Report Footer") << QObject::tr("Data") << QObject::tr("SubDetail");
 
     foreach(ItemAttribs attr,LimeReport::DesignElementsFactory::instance().attribsMap().values()){
         if ((attr.m_tag==LimeReport::Const::bandTAG)&&(!bandsList.contains(attr.m_alias)))
@@ -93,6 +94,8 @@ BandDesignIntf *BandsManager::createBand(BandDesignIntf::BandsType bandType, QOb
         return new DataFooterBand(owner, parent);
     case BandDesignIntf::TearOffBand:
         return new TearOffBand(owner, parent);
+    case BandDesignIntf::PageContentFooter:
+        return new PageContentFooter(owner, parent);
     }
 
     return 0;

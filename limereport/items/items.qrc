@@ -45,5 +45,6 @@
         <file alias="DataHeaderBand">images/DataHeaderBand.png</file>
         <file alias="DataFooterBand">images/DataFooterBand.png</file>
         <file alias="SVGItem">images/SVGItem.png</file>
+        <file alias="PageContentFooter">images/PageContentFooter.png</file>
     </qresource>
 </RCC>

@@ -126,6 +126,7 @@ private:
     void    renderDataBand(BandDesignIntf* dataBand);
     void    renderPageHeader(PageItemDesignIntf* patternPage);
     void    renderReportHeader(PageItemDesignIntf* patternPage, PageRenderStage stage);
+    void renderPageContentFooter(PageItemDesignIntf *patternPage);
     void    renderPageFooter(PageItemDesignIntf* patternPage);
     void    renderPageItems(PageItemDesignIntf* patternPage);
     void    renderChildHeader(BandDesignIntf* parent, BandPrintMode printMode);
@@ -187,6 +188,10 @@ private:
     void updateTOC(BaseDesignIntf* item, int pageNumber);
     void placeBandOnPage(BandDesignIntf *band, int columnIndex);
     QColor makeBackgroundColor(BandDesignIntf *band);
+
+    BandDesignIntf *findAutoFillPositionBand(PageItemDesignIntf *page); // add by hwf
+    bool fillFullPaper(PageItemDesignIntf *patternPage);                // add by hwf
+
 private:
     DataSourceManager* m_datasources;
     ScriptEngineContext* m_scriptEngineContext;
@@ -203,6 +208,7 @@ private:
     QMap<QString,QVariant> m_popupedValues;
     QMultiMap<BandDesignIntf*,QString> m_popupedExpression;
 
+    qreal m_pageConentFooterHeight; // add by hwf
     qreal           m_pageFooterHeight;
     qreal           m_dataAreaSize;
     qreal           m_reportFooterHeight;

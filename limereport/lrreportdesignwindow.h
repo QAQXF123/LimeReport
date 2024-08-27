@@ -216,6 +216,7 @@ private:
     QAction* m_deletePageAction;
 
     QAction* m_newPageHeader;
+    QAction *m_newPageContentFooter;
     QAction* m_newPageFooter;
     QAction* m_newReportHeader;
     QAction* m_newReportFooter;

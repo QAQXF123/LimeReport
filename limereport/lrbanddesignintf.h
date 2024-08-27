@@ -118,21 +118,21 @@ class BandDesignIntf : public ItemsContainerDesignInft
     friend class BandNameLabel;
     friend class ReportRender;
 public:
-
     enum BandsType {
-        PageHeader=0,
-        ReportHeader=1,
-        DataHeader=2,
-        GroupHeader=3,
-        Data=4,
-        SubDetailHeader=5,
-        SubDetailBand=6,
-        SubDetailFooter=7,
-        GroupFooter=8,
-        DataFooter=9,
-        ReportFooter=10,
-        TearOffBand=11,
-        PageFooter=12
+        PageHeader = 0,
+        ReportHeader = 1,
+        DataHeader = 2,
+        GroupHeader = 3,
+        Data = 4,
+        SubDetailHeader = 5,
+        SubDetailBand = 6,
+        SubDetailFooter = 7,
+        GroupFooter = 8,
+        DataFooter = 9,
+        ReportFooter = 10,
+        TearOffBand = 11,
+        PageFooter = 12,
+        PageContentFooter = 13 // add by hwf
     };
 
     enum BandColumnsLayoutType{

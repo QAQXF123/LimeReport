@@ -50,7 +50,7 @@ public:
     const QString& name(){return m_name;}
     const QString& data(){return m_data;}
     const QString& error(){return m_errorMessage;}
-    QVector<QVariant>& values(){return m_values;}
+    QVector<QVariant> &values() { return m_values; }
     QHash<BandDesignIntf*, QVariant> m_valuesByBand;
     const QString& dataBandName(){return m_dataBandName;}
     virtual QVariant calculate(PageItemDesignIntf* page = 0)=0;

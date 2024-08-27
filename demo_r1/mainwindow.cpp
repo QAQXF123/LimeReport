@@ -97,7 +97,10 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(slotOneSlotDS(LimeReport::CallbackInfo,QVariant&)));
 
     QStringList simpleData;
-    simpleData << "value1" << "value2" << "value3";
+    // simpleData << "value1" << "value2" << "value3";
+    simpleData << "0.00001"
+               << "10.56789"
+               << "5.000134";
     QStringListModel* stringListModel = new QStringListModel();
     stringListModel->setStringList(simpleData);
 
@@ -125,6 +128,9 @@ void MainWindow::on_pushButton_clicked()
     if (!ui->leVariableName->text().isEmpty() && !ui->leVariableValue->text().isEmpty()){
         report->dataManager()->setReportVariable(ui->leVariableName->text(), ui->leVariableValue->text());
     }
+    report->dataManager()->clearUserVariables();
+    report->dataManager()->setReportVariable("testVar", 0.0000001);
+    report->dataManager()->setReportVariable("zbrq", "2024/5/2");
     report->setShowProgressDialog(false);
     report->designReport();
     EASY_END_BLOCK;
@@ -156,6 +162,9 @@ void MainWindow::on_pushButton_2_clicked()
 //            printers.insert("default",printer);
 //            report->printReport(printers);
 //        }
+        report->dataManager()->clearUserVariables();
+        report->dataManager()->setReportVariable("testVar", 0.0000001);
+        report->dataManager()->setReportVariable("zbrq", "2024/5/2");
         report->setShowProgressDialog(true);
         report->previewReport();
     }

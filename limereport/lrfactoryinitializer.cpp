@@ -1,12 +1,12 @@
 #include "bands/lrdataband.h"
 #include "bands/lrgroupbands.h"
+#include "bands/lrpagecontentfooter.h"
 #include "bands/lrpagefooter.h"
 #include "bands/lrpageheader.h"
-#include "bands/lrreportheader.h"
 #include "bands/lrreportfooter.h"
+#include "bands/lrreportheader.h"
 #include "bands/lrsubdetailband.h"
 #include "bands/lrtearoffband.h"
-
 
 #include "items/lrtextitem.h"
 #ifdef HAVE_ZINT
@@ -88,6 +88,11 @@ BaseDesignIntf * createPageHeaderBand(QObject* owner, LimeReport::BaseDesignIntf
 
 BaseDesignIntf * createPageFooterBand(QObject* owner, LimeReport::BaseDesignIntf*  parent){
     return new LimeReport::PageFooter(owner,parent);
+}
+
+BaseDesignIntf *createPageContentFooterBand(QObject *owner, LimeReport::BaseDesignIntf *parent)
+{
+    return new LimeReport::PageContentFooter(owner, parent);
 }
 
 BaseDesignIntf * createSubDetailBand(QObject* owner, LimeReport::BaseDesignIntf*  parent){
@@ -207,6 +212,11 @@ void initReportItems(){
             LimeReport::ItemAttribs(QObject::tr("Page Footer"),LimeReport::Const::bandTAG),
             createPageFooterBand
     );
+    DesignElementsFactory::instance()
+        .registerCreator("PageContentFooter",
+                         LimeReport::ItemAttribs(QObject::tr("PageContent Footer"),
+                                                 LimeReport::Const::bandTAG),
+                         createPageContentFooterBand);
     DesignElementsFactory::instance().registerCreator(
             "PageHeader",
             LimeReport::ItemAttribs(QObject::tr("Page Header"),LimeReport::Const::bandTAG),

@@ -305,6 +305,7 @@ void BandDesignIntf::translateBandsName()
     tr("GroupBandHeader");
     tr("GroupBandFooter");
     tr("TearOffBand");
+    tr("PageContentFooter");
 }
 
 BandDesignIntf::BandsType  BandDesignIntf::bandType() const
@@ -1107,9 +1108,10 @@ void BandDesignIntf::setKeepFooterTogether(bool value)
 void BandDesignIntf::updateItemSize(DataSourceManager* dataManager, RenderPass pass, int maxHeight)
 {
     qreal spaceBorder = 0;
-    if (keepBottomSpace()) spaceBorder = bottomSpace();
+    if (keepBottomSpace())
+        spaceBorder = bottomSpace();
     spaceBorder = spaceBorder > 0 ? spaceBorder : 0;
-    if (borderLines() != 0){
+    if (borderLines() != 0) {
         spaceBorder += borderLineSize() + 2;
     }
 

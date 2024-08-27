@@ -713,7 +713,9 @@ int ScriptEngineManager::getPageFreeSpace(PageItemDesignIntf* page){
             }
             else height += band->height();
         }
-        return page->height() - height - (page->pageFooter()?page->pageFooter()->height() : 0);
+        return page->height() - height
+               - (page->pageContentFooter() ? page->pageContentFooter()->height() : 0)
+               - (page->pageFooter() ? page->pageFooter()->height() : 0);
     } else return -1;
 }
 
@@ -1988,13 +1990,7 @@ QVariant ScriptFunctionsManager::round(QVariant value, int digit)
     } else {
         d = floor(d / lp + 0.500000001) * lp;
     }
-    int iBit;
-    if (digit < 0) {
-        iBit = qAbs(digit);
-    } else {
-        iBit = 0;
-    }
-    return QString::number(d, 'f', iBit);
+    return d;
 }
 
 QVariant ScriptFunctionsManager::cnNYR(QVariant value)
@@ -2008,7 +2004,9 @@ QVariant ScriptFunctionsManager::cnNYR(QVariant value)
         QStringList list = dateStr.split(QRegExp("[-./]"));
         if (list.size() < 3)
             return "";
-        return list.at(0) + "年" + list.at(1) + "月" + list.at(2) + "日";
+        QString m = list.at(1).rightJustified(2, QLatin1Char('0'));
+        QString d = list.at(2).rightJustified(2, QLatin1Char('0'));
+        return list.at(0) + "年" + m + "月" + d + "日";
     }
 }
 

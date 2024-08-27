@@ -119,9 +119,9 @@ void TextItem::preparePopUpMenu(QMenu &menu)
     action->setCheckable(true);
     action->setChecked(isWatermark());
 
-    action = menu.addAction(tr("Hide if empty"));
-    action->setCheckable(true);
-    action->setChecked(hideIfEmpty());
+    // action = menu.addAction(tr("Hide if empty"));
+    // action->setCheckable(true);
+    // action->setChecked(hideIfEmpty());
 
     action = menu.addAction(tr("Hide zero value"));
     action->setCheckable(true);

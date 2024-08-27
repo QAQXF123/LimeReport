@@ -315,7 +315,6 @@ private:
     void updateTranslations();
     //ITranslationContainer
     ReportPages renderToPages();
-    void fillFullPaper(PageItemDesignIntf *page, ReportPages renderedPages); // add by hwf
     ReportPages appendPages(ReportPages s1, ReportPages s2, AppendType appendType);
     QString renderToString();
     PageItemDesignIntf *getPageByName(const QString& pageName);

@@ -84,15 +84,13 @@ QSizeF PageEditor::getRectByPageSize(const LimeReport::PageItemDesignIntf::PageS
 void PageEditor::on_format_currentIndexChanged(int index)
 {
     QPageSize ps = *new QPageSize();
-    if(ui->format->currentText() != "Custom")
-    {
-        QSizeF pageSize = getRectByPageSize(static_cast<LimeReport::PageItemDesignIntf::PageSize>(index));
+    if (ui->format->currentText() != "Custom") {
+        QSizeF pageSize = getRectByPageSize(
+            static_cast<LimeReport::PageItemDesignIntf::PageSize>(index));
         ui->width->setValue(pageSize.width() / m_page->unitFactor());
         ui->height->setValue(pageSize.height() / m_page->unitFactor());
     }
-
 }
-
 
 void PageEditor::on_buttonBox_clicked(QAbstractButton *button)
 {

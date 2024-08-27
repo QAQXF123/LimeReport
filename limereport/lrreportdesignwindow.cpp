@@ -446,7 +446,12 @@ void ReportDesignWindow::createBandsButton()
     m_bandsAddSignalsMap->setMapping(m_newPageHeader,BandDesignIntf::PageHeader);
     m_newBandButton->addAction(m_newPageHeader);
 
-    m_newPageFooter=new QAction(QIcon(),tr("Page Footer"),this);
+    m_newPageContentFooter = new QAction(QIcon(), tr("PageContent Footer"), this);
+    connect(m_newPageContentFooter, SIGNAL(triggered()), m_bandsAddSignalsMap, SLOT(map()));
+    m_bandsAddSignalsMap->setMapping(m_newPageContentFooter, BandDesignIntf::PageContentFooter);
+    m_newBandButton->addAction(m_newPageContentFooter);
+
+    m_newPageFooter = new QAction(QIcon(), tr("Page Footer"), this);
     connect(m_newPageFooter,SIGNAL(triggered()),m_bandsAddSignalsMap,SLOT(map()));
     m_bandsAddSignalsMap->setMapping(m_newPageFooter,BandDesignIntf::PageFooter);
     m_newBandButton->addAction(m_newPageFooter);
@@ -725,6 +730,7 @@ void ReportDesignWindow::startNewReport()
     updateRedoUndo();
     m_reportDesignWidget->slotPagesLoadFinished();
     m_newPageHeader->setEnabled(true);
+    m_newPageContentFooter->setEnabled(true);
     m_newPageFooter->setEnabled(true);
     m_newReportHeader->setEnabled(true);
     m_newReportFooter->setEnabled(true);
@@ -1310,6 +1316,9 @@ void ReportDesignWindow::slotBandAdded(PageDesignIntf *, BandDesignIntf * band)
         case BandDesignIntf::PageHeader:
             m_newPageHeader->setDisabled(true);
             break;
+        case BandDesignIntf::PageContentFooter:
+            m_newPageContentFooter->setDisabled(true);
+            break;
         case BandDesignIntf::PageFooter:
             m_newPageFooter->setDisabled(true);
             break;
@@ -1335,6 +1344,9 @@ void ReportDesignWindow::slotBandDeleted(PageDesignIntf *, BandDesignIntf *band)
         case BandDesignIntf::PageHeader:
             m_newPageHeader->setEnabled(true);
             break;
+        case BandDesignIntf::PageContentFooter:
+            m_newPageContentFooter->setEnabled(true);
+            break;
         case BandDesignIntf::PageFooter:
             m_newPageFooter->setEnabled(true);
             break;
@@ -1356,6 +1368,7 @@ void ReportDesignWindow::updateAvaibleBands(){
 
     if (!m_reportDesignWidget || !m_reportDesignWidget->activePage()) return;
     m_newPageHeader->setEnabled(true);
+    m_newPageContentFooter->setEnabled(true);
     m_newPageFooter->setEnabled(true);
     m_newReportHeader->setEnabled(true);
     m_newReportFooter->setEnabled(true);
@@ -1365,6 +1378,9 @@ void ReportDesignWindow::updateAvaibleBands(){
         switch (band->bandType()) {
         case BandDesignIntf::PageHeader:
             m_newPageHeader->setEnabled(false);
+            break;
+        case BandDesignIntf::PageContentFooter:
+            m_newPageContentFooter->setEnabled(false);
             break;
         case BandDesignIntf::PageFooter:
             m_newPageFooter->setEnabled(false);
