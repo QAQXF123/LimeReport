@@ -703,7 +703,8 @@ int ScriptEngineManager::findPageIndexByBookmark(const QString &uniqKey)
     return -1;
 }
 
-int ScriptEngineManager::getPageFreeSpace(PageItemDesignIntf* page){
+int ScriptEngineManager::getPageFreeSpace(PageItemDesignIntf *page)
+{
     if (page){
         int height = 0;
         foreach(BandDesignIntf* band, page->bands()){
@@ -717,6 +718,17 @@ int ScriptEngineManager::getPageFreeSpace(PageItemDesignIntf* page){
                - (page->pageContentFooter() ? page->pageContentFooter()->height() : 0)
                - (page->pageFooter() ? page->pageFooter()->height() : 0);
     } else return -1;
+}
+
+int ScriptEngineManager::getPageFreeSpaceH(BaseDesignIntf *item)
+{
+    if (item) {
+        PageItemDesignIntf *pageItem = dynamic_cast<PageItemDesignIntf *>(m_context->currentPage());
+        if (pageItem == nullptr)
+            return -1;
+        return pageItem->width() - item->x() - pageItem->rightMargin();
+    }
+    return -1;
 }
 
 void ScriptEngineManager::addTableOfContentsItem(const QString& uniqKey, const QString& content, int indent)
@@ -2122,6 +2134,11 @@ int ScriptFunctionsManager::findPageIndexByBookmark(const QString &uniqKey)
 
 int ScriptFunctionsManager::getPageFreeSpace(QObject* page){
     return scriptEngineManager()->getPageFreeSpace(dynamic_cast<PageItemDesignIntf*>(page));
+}
+
+int ScriptFunctionsManager::getPageFreeSpaceH(QObject *item)
+{
+    return scriptEngineManager()->getPageFreeSpaceH(dynamic_cast<BaseDesignIntf *>(item));
 }
 
 void ScriptFunctionsManager::addTableOfContentsItem(const QString& uniqKey, const QString& content, int indent)

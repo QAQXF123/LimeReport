@@ -323,6 +323,10 @@ void ReportRender::renderPage(PageItemDesignIntf* patternPage, bool isTOC, bool 
         if (i < m_patternPageItem->dataBandCount()-1) closeFooterGroup(lastRenderedBand);
     }
 
+    // add by hwf
+    m_datasources->setReportVariable("#IS_LAST_PAGEFOOTER", true);
+    m_datasources->setReportVariable("#IS_FIRST_PAGEFOOTER",
+                                     m_datasources->variable("#PAGE").toInt() == 1);
     renderPageContentFooter(m_patternPageItem);
 
     if (reportFooter)
@@ -1515,7 +1519,6 @@ void ReportRender::startNewColumn(){
 
 void ReportRender::startNewPage(bool isFirst)
 {
-    qDebug() << "--------------------start new page--------------------";
     m_renderPageItem = 0;
     m_newPageStarted = true;
     initColumns();
