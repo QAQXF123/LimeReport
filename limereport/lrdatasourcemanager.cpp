@@ -240,16 +240,15 @@ DataSourceManager::DataSourceManager(QObject *parent) :
     setSystemVariable(QLatin1String("#IS_FIRST_PAGEFOOTER"),false,FirstPass);
     m_datasourcesModel.setDataSourceManager(this);
 
-    connect(&m_reportVariables, SIGNAL(variableHasBeenAdded(QString)),
-            this, SLOT(slotVariableHasBeenAdded(QString)));
-    connect(&m_reportVariables, SIGNAL(variableHasBeenChanged(QString)),
-            this, SLOT(slotVariableHasBeenChanged(QString)));
-    connect(&m_userVariables, SIGNAL(variableHasBeenAdded(QString)),
-            this, SLOT(slotVariableHasBeenAdded(QString)));
-    connect(&m_userVariables, SIGNAL(variableHasBeenChanged(QString)),
-            this, SLOT(slotVariableHasBeenChanged(QString)));
-
-
+    // modified by hwf
+    // connect(&m_reportVariables, SIGNAL(variableHasBeenAdded(QString)),
+    //         this, SLOT(slotVariableHasBeenAdded(QString)));
+    // connect(&m_reportVariables, SIGNAL(variableHasBeenChanged(QString)),
+    //         this, SLOT(slotVariableHasBeenChanged(QString)));
+    // connect(&m_userVariables, SIGNAL(variableHasBeenAdded(QString)),
+    //         this, SLOT(slotVariableHasBeenAdded(QString)));
+    // connect(&m_userVariables, SIGNAL(variableHasBeenChanged(QString)),
+    //         this, SLOT(slotVariableHasBeenChanged(QString)));
 }
 
 QString DataSourceManager::defaultDatabasePath() const
@@ -1406,11 +1405,12 @@ void DataSourceManager::addVariable(const QString &name, const QVariant &value, 
     } else {
         m_reportVariables.addVariable(name,value,type,pass);
     }
-    if (designTime()){
-        EASY_BLOCK("DataSourceManager::addVariable emit ds changed");
-        emit datasourcesChanged();
-        EASY_END_BLOCK;
-    }
+    // modified by hwf
+    // if (designTime()){
+    //     EASY_BLOCK("DataSourceManager::addVariable emit ds changed");
+    //     emit datasourcesChanged();
+    //     EASY_END_BLOCK;
+    // }
 }
 
 void DataSourceManager::deleteVariable(const QString& name)
