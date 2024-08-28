@@ -726,9 +726,16 @@ int ScriptEngineManager::getPageFreeSpaceH(BaseDesignIntf *item)
         PageItemDesignIntf *pageItem = dynamic_cast<PageItemDesignIntf *>(m_context->currentPage());
         if (pageItem == nullptr)
             return -1;
-        return pageItem->width() - item->x() - pageItem->rightMargin();
+        return pageItem->width() - item->x() - pageItem->rightMargin() - pageItem->leftMargin();
     }
     return -1;
+}
+
+int ScriptEngineManager::getCurrentBandWidth() {
+    BandDesignIntf* band = dynamic_cast<BandDesignIntf*>(m_context->currentBand());
+    if (band == nullptr)
+        return -1;
+    return band->width();
 }
 
 void ScriptEngineManager::addTableOfContentsItem(const QString& uniqKey, const QString& content, int indent)
@@ -2136,9 +2143,12 @@ int ScriptFunctionsManager::getPageFreeSpace(QObject* page){
     return scriptEngineManager()->getPageFreeSpace(dynamic_cast<PageItemDesignIntf*>(page));
 }
 
-int ScriptFunctionsManager::getPageFreeSpaceH(QObject *item)
-{
+int ScriptFunctionsManager::getPageFreeSpaceH(QObject *item){
     return scriptEngineManager()->getPageFreeSpaceH(dynamic_cast<BaseDesignIntf *>(item));
+}
+
+int ScriptFunctionsManager::getCurrentBandWidth() {
+    return scriptEngineManager()->getCurrentBandWidth();
 }
 
 void ScriptFunctionsManager::addTableOfContentsItem(const QString& uniqKey, const QString& content, int indent)

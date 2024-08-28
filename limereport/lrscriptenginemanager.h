@@ -432,7 +432,8 @@ public:
 #endif
     Q_INVOKABLE QFont font(QVariantMap params);
     Q_INVOKABLE int getPageFreeSpace(QObject *page);
-    Q_INVOKABLE int getPageFreeSpaceH(QObject *item); // add by hwf
+    Q_INVOKABLE int getPageFreeSpaceH(QObject* item); // add by hwf
+    Q_INVOKABLE int getCurrentBandWidth(); // add by hwf
     ScriptEngineManager *scriptEngineManager() const;
     void setScriptEngineManager(ScriptEngineManager *scriptEngineManager);
     static QColor createQColor(const QString& color){ return QColor(color);}
@@ -524,6 +525,7 @@ public:
     void    clearTableOfContents();
     int     getPageFreeSpace(PageItemDesignIntf *page);
     int getPageFreeSpaceH(BaseDesignIntf *item); // add by hwf
+    int getCurrentBandWidth(); // add by hwf
     ScriptValueType moveQObjectToScript(QObject* object, const QString objectName);
 protected:
     void updateModel();
