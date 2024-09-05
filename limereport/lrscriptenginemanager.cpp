@@ -2005,11 +2005,14 @@ QVariant ScriptFunctionsManager::round(QVariant value, int digit)
     double d = value.toDouble();
     double lp = qPow(10.0, digit);
     if (d < 0) {
-        d = ceil(d / lp - 0.500000001) * lp;
+        d = qCeil(d / lp - 0.500000001) * lp;
     } else {
-        d = floor(d / lp + 0.500000001) * lp;
+        d = qFloor(d / lp + 0.500000001) * lp;
     }
-    return d;
+    if (digit > 0)
+        digit = 0;
+    QString str = QString::number(d, 'f', qAbs(digit));
+    return str.replace(QRegExp("(\\.){0,1}0+$"), "");
 }
 
 QVariant ScriptFunctionsManager::cnNYR(QVariant value)

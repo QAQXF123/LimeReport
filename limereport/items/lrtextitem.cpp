@@ -480,6 +480,8 @@ QString TextItem::formatNumber(const double value)
     // 隐藏0值
     if (m_hideZeroValue && qFuzzyIsNull(dV))
         return "";
+    if (digit > 0)
+        digit = 0;
     QString str = QString::number(dV, 'f', qAbs(digit));
     // 尾部不补0时
     if (!bfixZero && (digit != 0))

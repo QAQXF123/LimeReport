@@ -155,6 +155,7 @@ public:
     SubQueryDesc* subQueryByName(const QString& datasourceName);
     ProxyDesc* proxyByName(const QString& datasourceName);
     CSVDesc* csvByName(const QString& datasourceName);
+    void changeQueryConnectName(const QString &connectionName); // add by hwf
     ConnectionDesc *connectionByName(const QString& connectionName);
     int queryIndexByName(const QString& dataSourceName);
     int subQueryIndexByName(const QString& dataSourceName);
@@ -190,6 +191,7 @@ public:
     QString extractFieldName(const QString& fieldName);
     void setAllDatasourcesToFirst();
     void clear(ClearMethod method);
+    void clearAll(); // add by hwf
     void clearGroupFunction();
     void clearGroupFunctionValues(const QString &bandObjectName);
 

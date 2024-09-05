@@ -777,6 +777,21 @@ CSVDesc *DataSourceManager::csvByName(const QString &datasourceName)
     else return 0;
 }
 
+void DataSourceManager::changeQueryConnectName(const QString &connectionName)
+{
+    for (int i = 0; i < m_queries.count(); i++) {
+        QueryDesc *desc = m_queries.at(i);
+        desc->setConnectionName(connectionName);
+    }
+    for (int i = 0; i < m_subqueries.count(); ++i) {
+        QueryDesc *desc = m_subqueries.at(i);
+        desc->setConnectionName(connectionName);
+    }
+    m_hasChanges = true;
+    m_varToDataSource.clear();
+    emit datasourcesChanged();
+}
+
 void DataSourceManager::removeDatasource(const QString &name)
 {
     if (m_datasources.contains(name)){
@@ -1578,6 +1593,43 @@ void DataSourceManager::clear(ClearMethod method)
     m_proxies.clear();
 //    if (method == All)
 //        clearUserVariables();
+    clearReportVariables();
+
+    emit cleared();
+}
+
+void DataSourceManager::clearAll()
+{
+    m_varToDataSource.clear();
+
+    DataSourcesMap::iterator dit;
+    for (dit = m_datasources.begin(); dit != m_datasources.end();) {
+        invalidateLinkedDatasources(dit.key());
+        delete dit.value();
+        dit = m_datasources.erase(dit);
+    }
+
+    QList<ConnectionDesc *>::iterator cit = m_connections.begin();
+    while (cit != m_connections.end()) {
+        if ((*cit)->isInternal())
+            QSqlDatabase::removeDatabase((*cit)->name());
+        delete (*cit);
+        cit = m_connections.erase(cit);
+    }
+
+    //TODO: add smart pointes to collections
+    foreach (QueryDesc *desc, m_queries)
+        delete desc;
+    foreach (SubQueryDesc *desc, m_subqueries)
+        delete desc;
+    foreach (ProxyDesc *desc, m_proxies)
+        delete desc;
+
+    m_queries.clear();
+    m_subqueries.clear();
+    m_proxies.clear();
+    //    if (method == All)
+    //        clearUserVariables();
     clearReportVariables();
 
     emit cleared();

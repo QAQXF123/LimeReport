@@ -67,8 +67,23 @@ public:
     virtual bool variableIsSystem(const QString& name) = 0;
     virtual IDataSource* dataSource(const QString& name) = 0;
     virtual IDataSourceHolder* dataSourceHolder(const QString& name) = 0;
+    // add by hwf
+    virtual void addConnection(const QString &connectionName) = 0;
+    virtual void removeDatasource(const QString &name) = 0;
+    virtual void changeQueryConnectName(const QString &connectionName) = 0;
+    virtual void clearAll() = 0;
+    virtual bool isQuery(const QString &dataSourceName) = 0;
+    virtual bool isSubQuery(const QString &dataSourceName) = 0;
+    virtual void addQuery(const QString &name,
+                          const QString &sqlText,
+                          const QString &connectionName = "")
+        = 0;
+    virtual void addSubQuery(const QString &name,
+                             const QString &sqlText,
+                             const QString &connectionName,
+                             const QString &masterDatasource)
+        = 0;
 };
-
 }
 #endif // LRDATASOURCEMANAGERINTF_H
 
