@@ -176,7 +176,7 @@ void AbstractLayout::geometryChangedEvent(QRectF newRect, QRectF)
 void AbstractLayout::initMode(BaseDesignIntf::ItemMode mode)
 {
     BaseDesignIntf::initMode(mode);
-    if ((mode==PreviewMode)||(mode==PrintMode)){
+    if ((mode == PreviewMode) || (mode == PrintMode) || (mode == FillFullPaperMode)) {
         layoutMarker()->setVisible(false);
     } else {
         layoutMarker()->setVisible(true);

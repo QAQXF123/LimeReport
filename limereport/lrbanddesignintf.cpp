@@ -843,7 +843,7 @@ QVariant BandDesignIntf::itemChange(QGraphicsItem::GraphicsItemChange change, co
 void BandDesignIntf::initMode(ItemMode mode)
 {
     BaseDesignIntf::initMode(mode);
-    if ((mode==PreviewMode)||(mode==PrintMode)){
+    if ((mode == PreviewMode) || (mode == PrintMode) || (mode == FillFullPaperMode)) {
         m_bandMarker->setVisible(false);
     } else {
         if (!m_bandMarker->scene() && this->scene()){

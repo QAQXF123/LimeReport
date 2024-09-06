@@ -69,6 +69,8 @@ PageItemDesignIntf::PageItemDesignIntf(QObject *owner, QGraphicsItem *parent)
     , m_dropPrinterMargins(false)
     , m_notPrintIfEmpty(false)
     , m_mixWithPriorPage(false)
+    , m_thickBorder(false)
+    , m_fillFullPaper(false)
 {
     setFixedPos(true);
     setPossibleResizeDirectionFlags(Fixed);
@@ -103,6 +105,8 @@ PageItemDesignIntf::PageItemDesignIntf(const PageSize pageSize,
     , m_dropPrinterMargins(false)
     , m_notPrintIfEmpty(false)
     , m_mixWithPriorPage(false)
+    , m_thickBorder(false)
+    , m_fillFullPaper(false)
 {
     setFixedPos(true);
     setPossibleResizeDirectionFlags(Fixed);
@@ -135,7 +139,7 @@ void PageItemDesignIntf::paint(QPainter *ppainter, const QStyleOptionGraphicsIte
         ppainter->restore();
     }
 
-    if (itemMode() & PreviewMode) {
+    if ((itemMode() & PreviewMode) || (itemMode() & FillFullPaperMode)) {
         ppainter->save();
         ppainter->fillRect(rect(), Qt::white);
         QPen pen;
@@ -149,7 +153,6 @@ void PageItemDesignIntf::paint(QPainter *ppainter, const QStyleOptionGraphicsIte
         ppainter->restore();
         BaseDesignIntf::paint(ppainter,option,widget);
     }
-
 }
 
 BaseDesignIntf *PageItemDesignIntf::createSameTypeItem(QObject *owner, QGraphicsItem *parent)
