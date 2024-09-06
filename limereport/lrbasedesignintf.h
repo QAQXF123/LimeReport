@@ -43,7 +43,14 @@ Q_DECLARE_METATYPE(QList<QObject*>*)
 
 namespace LimeReport {
 
-enum ItemModes{ DesignMode=1, PreviewMode=2, PrintMode=4, EditMode=8, LayoutEditMode=16 };
+enum ItemModes {
+    DesignMode = 1,
+    PreviewMode = 2,
+    PrintMode = 4,
+    EditMode = 8,
+    LayoutEditMode = 16,
+    FillFullPaperMode = 32,
+};
 
 class ReportEnginePrivate;
 class PageDesignIntf;

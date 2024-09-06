@@ -70,7 +70,7 @@ public:
     // add by hwf
     virtual void addConnection(const QString &connectionName) = 0;
     virtual void removeDatasource(const QString &name) = 0;
-    virtual void changeQueryConnectName(const QString &connectionName) = 0;
+    virtual void changeQueryConnectionName(const QString &connectionName) = 0;
     virtual void clearAll() = 0;
     virtual bool isQuery(const QString &dataSourceName) = 0;
     virtual bool isSubQuery(const QString &dataSourceName) = 0;

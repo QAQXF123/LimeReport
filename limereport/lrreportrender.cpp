@@ -233,29 +233,17 @@ void ReportRender::analizePage(PageItemDesignIntf* patternPage){
     }
 }
 
-BandDesignIntf *ReportRender::findAutoFillPositionBand(PageItemDesignIntf *page)
+qreal ReportRender::getFreeSpaceHeight(qreal currentY)
 {
-    // ReportFooter=10 》 TearOffBand=11 》 PageFooter=12 》 PageContentFooter=13
-    BandDesignIntf *posBand = page->bandByType(DataBandDesignIntf::BandsType::PageContentFooter);
-    if (posBand)
-        return posBand;
-    posBand = page->bandByType(DataBandDesignIntf::BandsType::ReportFooter);
-    if (posBand)
-        return posBand;
-    posBand = m_renderPageItem->bandByType(DataBandDesignIntf::BandsType::TearOffBand);
-    if (posBand)
-        return posBand;
-    posBand = m_renderPageItem->bandByType(DataBandDesignIntf::BandsType::PageFooter);
-    if (posBand)
-        return posBand;
-    return nullptr;
+    return m_renderPageItem->height() - currentY - m_pageConentFooterHeight - m_pageFooterHeight
+           - m_reportFooterHeight - m_renderPageItem->bottomMargin() * 10;
 }
 
 bool ReportRender::fillFullPaper(PageItemDesignIntf *patternPage)
 {
     if (!patternPage->fillFullPaper())
         return false;
-    // 按主项分页不处理
+    // 只处理最后一页，按主项分页不处理
     BandDesignIntf *dataBand = patternPage->bandByType(DataBandDesignIntf::BandsType::Data);
     if (dataBand && dataBand->startNewPage())
         return false;
@@ -265,15 +253,23 @@ bool ReportRender::fillFullPaper(PageItemDesignIntf *patternPage)
         refBand = patternPage->bandByName(patternPage->blankRowRefBand());
     if (refBand == nullptr)
         return false;
-    // 插入位置
-    BandDesignIntf *posBand = nullptr;
-    if (m_renderPageItem->blankRowInsertPosition().isEmpty())
-        posBand = findAutoFillPositionBand(m_renderPageItem);
-    else
-        posBand = m_renderPageItem->bandByName(m_renderPageItem->blankRowInsertPosition());
-    if (posBand == nullptr)
-        return false;
+    // 插入位置：m_renderPageItem->blankRowInsertPosition()　暂未处理
+
     // m_renderPageItem
+    qreal hRow = m_lastRenderedBand->height();
+    if (hRow < 23)
+        hRow = 23;
+    qreal currentY = m_lastRenderedBand->y() + m_lastRenderedBand->height();
+    while (hRow <= getFreeSpaceHeight(currentY)) {
+        BandDesignIntf *bandClone = dynamic_cast<BandDesignIntf *>(
+            refBand->cloneItem(FillFullPaperMode, m_renderPageItem, m_renderPageItem));
+        bandClone->setItemPos(m_renderPageItem->pageRect().x(), currentY);
+        bandClone->setHeight(hRow);
+        for (int i = 0; i < m_maxHeightByColumn.size(); ++i)
+            m_maxHeightByColumn[i] += hRow;
+        registerBand(bandClone);
+        currentY += hRow;
+    }
     return true;
 }
 
@@ -327,6 +323,7 @@ void ReportRender::renderPage(PageItemDesignIntf* patternPage, bool isTOC, bool 
     m_datasources->setReportVariable("#IS_LAST_PAGEFOOTER", true);
     m_datasources->setReportVariable("#IS_FIRST_PAGEFOOTER",
                                      m_datasources->variable("#PAGE").toInt() == 1);
+    fillFullPaper(m_patternPageItem);
     renderPageContentFooter(m_patternPageItem);
 
     if (reportFooter)
@@ -661,7 +658,8 @@ BandDesignIntf* ReportRender::renderBand(BandDesignIntf *patternBand, BandDesign
         m_scriptEngineContext->setCurrentBand(bandClone);
 
         if (isLast && bandClone->keepFooterTogether() && bandClone->sliceLastRow()) {
-            if (m_maxHeightByColumn[m_currentColumn] < (bandClone->height()+m_reportFooterHeight))
+            if (m_maxHeightByColumn[m_currentColumn]
+                < (bandClone->height() + m_reportFooterHeight + m_pageConentFooterHeight))
                 m_maxHeightByColumn[m_currentColumn] -= ((m_maxHeightByColumn[m_currentColumn]-bandClone->height())+(bandClone->height()*calcSlicePercent(bandClone->height())));
         }
 

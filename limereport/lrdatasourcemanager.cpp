@@ -777,7 +777,7 @@ CSVDesc *DataSourceManager::csvByName(const QString &datasourceName)
     else return 0;
 }
 
-void DataSourceManager::changeQueryConnectName(const QString &connectionName)
+void DataSourceManager::changeQueryConnectionName(const QString &connectionName)
 {
     for (int i = 0; i < m_queries.count(); i++) {
         QueryDesc *desc = m_queries.at(i);

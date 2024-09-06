@@ -328,7 +328,13 @@ QString TextItem::content() const{
 
 void TextItem::updateItemSize(DataSourceManager* dataManager, RenderPass pass, int maxHeight)
 {
-
+    if (itemMode() == FillFullPaperMode) // add by hwf
+    {
+        setContent("");
+        setWidth(width());
+        setHeight(height());
+        return;
+    }
     if (isNeedExpandContent())
         expandContent(dataManager, pass);
 
@@ -579,7 +585,6 @@ TextItem::TextPtr TextItem::textDocument() const
 {
     TextPtr text(new QTextDocument);
     QString content = m_trimValue ? m_strText.trimmed() : m_strText;
-
     if (allowHTML())
         if (isReplaceCarriageReturns()){
             text->setHtml(replaceReturns(content));

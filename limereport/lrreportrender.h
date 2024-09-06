@@ -189,7 +189,7 @@ private:
     void placeBandOnPage(BandDesignIntf *band, int columnIndex);
     QColor makeBackgroundColor(BandDesignIntf *band);
 
-    BandDesignIntf *findAutoFillPositionBand(PageItemDesignIntf *page); // add by hwf
+    qreal getFreeSpaceHeight(qreal currentY);                           // add by hwf
     bool fillFullPaper(PageItemDesignIntf *patternPage);                // add by hwf
 
 private:
