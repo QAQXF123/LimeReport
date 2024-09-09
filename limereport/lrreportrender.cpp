@@ -236,7 +236,7 @@ void ReportRender::analizePage(PageItemDesignIntf* patternPage){
 qreal ReportRender::getFreeSpaceHeight(qreal currentY)
 {
     return m_renderPageItem->height() - currentY - m_pageConentFooterHeight - m_pageFooterHeight
-           - m_reportFooterHeight - m_renderPageItem->bottomMargin() * 10;
+           - m_reportFooterHeight - m_renderPageItem->bottomMargin() * Const::mmFACTOR;
 }
 
 bool ReportRender::fillFullPaper(PageItemDesignIntf *patternPage)
@@ -256,19 +256,17 @@ bool ReportRender::fillFullPaper(PageItemDesignIntf *patternPage)
     // 插入位置：m_renderPageItem->blankRowInsertPosition()　暂未处理
 
     // m_renderPageItem
-    qreal hRow = m_lastRenderedBand->height();
-    if (hRow < 23)
-        hRow = 23;
-    qreal currentY = m_lastRenderedBand->y() + m_lastRenderedBand->height();
-    while (hRow <= getFreeSpaceHeight(currentY)) {
+    qreal rowHeight = refBand->findMaxHeight();
+    qreal currentY = m_lastRenderedBand->y() + m_lastRenderedBand->findMaxHeight();
+    if (m_lastRenderedBand->isData())
+        rowHeight = m_lastRenderedBand->findMaxHeight();
+    while (rowHeight <= getFreeSpaceHeight(currentY)) {
         BandDesignIntf *bandClone = dynamic_cast<BandDesignIntf *>(
             refBand->cloneItem(FillFullPaperMode, m_renderPageItem, m_renderPageItem));
+        bandClone->setHeight(rowHeight);
         bandClone->setItemPos(m_renderPageItem->pageRect().x(), currentY);
-        bandClone->setHeight(hRow);
-        for (int i = 0; i < m_maxHeightByColumn.size(); ++i)
-            m_maxHeightByColumn[i] += hRow;
         registerBand(bandClone);
-        currentY += hRow;
+        currentY = bandClone->y() + rowHeight;
     }
     return true;
 }
