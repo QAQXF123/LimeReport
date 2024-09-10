@@ -117,15 +117,16 @@ void XMLReader::readItemFromNode(QObject* item,QDomElement *node)
     EASY_BLOCK("readItemFromNode");
     ObjectLoadingStateIntf* lf = dynamic_cast<ObjectLoadingStateIntf*>(item);
     if(lf) lf->objectLoadStarted();
-    for (int i=0;i<node->childNodes().count();i++){
-        QDomElement currentNode =node->childNodes().at(i).toElement();
+    QDomNodeList childs = node->childNodes();
+    for (int i = 0; i < childs.count(); i++) {
+        QDomElement currentNode = childs.at(i).toElement();
         if (currentNode.attribute("Type")=="Object"){
             readQObject(item,&currentNode);
         } else if (currentNode.attribute("Type")=="Collection")
         {
             readCollection(item,&currentNode);
         } else if (currentNode.attribute("Type")=="Translation"){
-            readTranslation(item,&currentNode);
+            readTranslation(item, &currentNode);
         } else readProperty(item,&currentNode);
     }
     if (lf) lf->objectLoadFinished();
@@ -205,8 +206,9 @@ void XMLReader::readCollection(QObject *item, QDomElement *node)
     ICollectionContainer* collection = dynamic_cast<ICollectionContainer*>(item);
     if (collection){
         QString collectionName = node->nodeName();
-        for(int i = 0; i < node->childNodes().count(); ++i){
-            QDomElement currentNode =node->childNodes().at(i).toElement();
+        QDomNodeList items = node->childNodes();
+        for (int i = 0; i < items.count(); ++i) {
+            QDomElement currentNode = items.at(i).toElement();
             QObject* obj = collection->createElement(collectionName,currentNode.attribute("ClassName"));
             if (obj)
                 readItemFromNode(obj,&currentNode);

@@ -726,8 +726,8 @@ int ScriptEngineManager::getPageFreeSpaceH(BaseDesignIntf *item)
         PageItemDesignIntf *pageItem = dynamic_cast<PageItemDesignIntf *>(m_context->currentPage());
         if (pageItem == nullptr)
             return -1;
-        return pageItem->width() - item->x() - pageItem->rightMargin() * 10
-               - pageItem->leftMargin() * 10;
+        return pageItem->width() - item->x() - pageItem->rightMargin() * Const::mmFACTOR
+               - pageItem->leftMargin() * Const::mmFACTOR;
     }
     return -1;
 }
