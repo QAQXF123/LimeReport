@@ -257,9 +257,12 @@ bool ReportRender::fillFullPaper(PageItemDesignIntf *patternPage)
 
     // m_renderPageItem
     qreal rowHeight = refBand->findMaxHeight();
-    qreal currentY = m_lastRenderedBand->y() + m_lastRenderedBand->findMaxHeight();
-    if (m_lastRenderedBand->isData())
-        rowHeight = m_lastRenderedBand->findMaxHeight();
+    qreal currentY = 0;
+    if (m_lastRenderedBand) {
+        currentY = m_lastRenderedBand->y() + m_lastRenderedBand->findMaxHeight();
+        if (m_lastRenderedBand->isData())
+            rowHeight = m_lastRenderedBand->findMaxHeight();
+    }
     while (rowHeight <= getFreeSpaceHeight(currentY)) {
         BandDesignIntf *bandClone = dynamic_cast<BandDesignIntf *>(
             refBand->cloneItem(FillFullPaperMode, m_renderPageItem, m_renderPageItem));
@@ -764,7 +767,7 @@ void ReportRender::renderDataBand(BandDesignIntf *dataBand)
         //  renderGroupHeader(dataBand, bandDatasource, true); // modified by hwf
 
         bool firstTime = true;
-
+        bool bSavePage = false; // add by hwf
 
         while(!bandDatasource->eof() && !m_renderCanceled){
 
@@ -773,11 +776,11 @@ void ReportRender::renderDataBand(BandDesignIntf *dataBand)
             BandDesignIntf* rawData = renderData(dataBand);
 
             if (!rawData->isEmpty() || dataBand->printIfEmpty()){
-
-                if ((firstTime && dataBand->startFromNewPage()) ||
-                    (!firstTime && dataBand->startNewPage())) {
-                    savePage();
-                    startNewPage();           
+                if ((firstTime && dataBand->startFromNewPage())
+                    || (!firstTime && dataBand->startNewPage())) {
+                    if (!bSavePage)
+                        savePage();
+                    startNewPage();
                 }
 
                 // if (dataBand->tryToKeepTogether()) openDataGroup(dataBand);  // modified by hwf
@@ -794,6 +797,12 @@ void ReportRender::renderDataBand(BandDesignIntf *dataBand)
                 m_newPageStarted = false;
                 renderChildBands(dataBand);
 
+            }
+
+            //add by hwf:按主项数据分页时，需要在next()前进行savePage(),否则pageContentFooter\pageFooter调用数据不对
+            if (dataBand->startNewPage() && bandDatasource->hasNext()) {
+                savePage();
+                bSavePage = true;
             }
 
             bandDatasource->next();
@@ -881,7 +890,7 @@ void ReportRender::renderReportHeader(PageItemDesignIntf *patternPage, PageRende
 void ReportRender::renderPageContentFooter(PageItemDesignIntf *patternPage)
 {
     BandDesignIntf *band = patternPage->bandByType(BandDesignIntf::PageContentFooter);
-    if (band) {
+    if (band && m_lastRenderedBand) {
         BandDesignIntf *bandClone = dynamic_cast<BandDesignIntf *>(
             band->cloneItem(PreviewMode, m_renderPageItem, m_renderPageItem));
         replaceGroupsFunction(bandClone);
