@@ -346,6 +346,9 @@ private:
 
 class ScriptFunctionsManager : public QObject{
     Q_OBJECT
+private:
+    QString converBigRMB(double value, int digit);
+
 public:
     explicit ScriptFunctionsManager(QObject* parent = 0):QObject(parent){
         m_wrappersFactory.insert("QComboBox",new  ComboBoxWrapperCreator());
@@ -359,8 +362,11 @@ public:
     Q_INVOKABLE QVariant line(const QString& bandName);
     Q_INVOKABLE QVariant numberFormat(QVariant value, const char &format, int precision, const QString& locale);
     Q_INVOKABLE QVariant cnNO(QVariant value);                   // add by hwf
-    Q_INVOKABLE QVariant CNYBig(QVariant value, int digit = -2); // add by hwf
-    Q_INVOKABLE QVariant round(QVariant value, int digit = -2);  // add by hwf
+    Q_INVOKABLE QVariant CNYBig(QVariant value);                 // add by hwf
+    Q_INVOKABLE QVariant CNYBig2(QVariant value);                // add by hwf
+    Q_INVOKABLE QVariant roundToQStr(QVariant value,
+                                     int digit = -2,
+                                     bool reserveLastZero = false); // add by hwf
     Q_INVOKABLE QVariant cnNYR(QVariant value);                  // add by hwf
     Q_INVOKABLE QVariant dateFormat(QVariant value, const QString& format, const QString& locale);
     Q_INVOKABLE QVariant timeFormat(QVariant value, const QString& format);
@@ -535,7 +541,8 @@ private:
     bool createNumberFomatFunction();
     bool createCNNOFunction();   // add by hwf
     bool createCNYBigFunction(); // add by hwf
-    bool createRoundFunction();  // add by hwf
+    bool createCNYBig2Function();     // add by hwf
+    bool createRoundToQStrFunction(); // add by hwf
     bool createCNNYRFunction();  // add by hwf
     bool createDateFormatFunction();
     bool createTimeFormatFunction();

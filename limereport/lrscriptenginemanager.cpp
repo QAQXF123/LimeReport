@@ -829,27 +829,44 @@ bool ScriptEngineManager::createCNYBigFunction()
     fd.setManagerName(LimeReport::Const::FUNCTION_MANAGER_NAME);
     fd.setCategory(tr("NUMBER"));
     fd.setName("CNYBig");
-    fd.setDescription("CNYBig(\"" + tr("Value") + "\",\"" + tr("Digit") + "\")");
-    fd.setScriptWrapper(QString("function CNYBig(value, digit){"
-                                " if(typeof(digit)==='undefined') digit=-2; "
-                                "return %1.CNYBig(value,digit);}")
+    fd.setDescription("CNYBig(\"" + tr("Value") + "\")");
+    fd.setScriptWrapper(QString("function CNYBig(value){"
+                                "return %1.CNYBig(value);}")
                             .arg(LimeReport::Const::FUNCTION_MANAGER_NAME));
     return addFunction(fd);
 }
 
-bool ScriptEngineManager::createRoundFunction()
+bool ScriptEngineManager::createCNYBig2Function()
 {
     JSFunctionDesc fd;
 
     fd.setManager(m_functionManager);
     fd.setManagerName(LimeReport::Const::FUNCTION_MANAGER_NAME);
     fd.setCategory(tr("NUMBER"));
-    fd.setName("round");
-    fd.setDescription("round(\"" + tr("Value") + "\",\"" + tr("Digit") + "\")");
-    fd.setScriptWrapper(QString("function round(value, digit){"
-                                " if(typeof(digit)==='undefined') digit=-2; "
-                                "return %1.round(value,digit);}")
+    fd.setName("CNYBig2");
+    fd.setDescription("CNYBig2(\"" + tr("Value") + "\")");
+    fd.setScriptWrapper(QString("function CNYBig2(value){"
+                                "return %1.CNYBig2(value);}")
                             .arg(LimeReport::Const::FUNCTION_MANAGER_NAME));
+    return addFunction(fd);
+}
+
+bool ScriptEngineManager::createRoundToQStrFunction()
+{
+    JSFunctionDesc fd;
+
+    fd.setManager(m_functionManager);
+    fd.setManagerName(LimeReport::Const::FUNCTION_MANAGER_NAME);
+    fd.setCategory(tr("NUMBER"));
+    fd.setName("roundToQStr");
+    fd.setDescription("roundToQStr(\"" + tr("Value") + "\",\"" + tr("Digit") + "\",\""
+                      + tr("bReserveLastZero") + "\")");
+    fd.setScriptWrapper(
+        QString("function roundToQStr(value, digit, bReserveLastZero){"
+                " if(typeof(digit)==='undefined') digit=-2; "
+                " if(typeof(bReserveLastZero)==='undefined') bReserveLastZero=false; "
+                "return %1.roundToQStr(value,digit,bReserveLastZero);}")
+            .arg(LimeReport::Const::FUNCTION_MANAGER_NAME));
     return addFunction(fd);
 }
 
@@ -1244,7 +1261,8 @@ ScriptEngineManager::ScriptEngineManager()
     createNumberFomatFunction();
     createCNNOFunction();  // add by hwf
     createCNYBigFunction(); // add by hwf
-    createRoundFunction(); // add by hwf
+    createCNYBig2Function();     // add by hwf
+    createRoundToQStrFunction(); // add by hwf
     createCNNYRFunction(); // add by hwf
     createDateFormatFunction();
     createTimeFormatFunction();
@@ -1931,19 +1949,21 @@ QVariant ScriptFunctionsManager::cnNO(QVariant value)
     return QVariant(result);
 }
 
-QVariant ScriptFunctionsManager::CNYBig(QVariant value, int digit)
+// digit 只能为0\-1\-2
+QString ScriptFunctionsManager::converBigRMB(double value, int digit)
 {
-    double Fnumber = round(value.toDouble(), digit).toDouble();
-    if (qFuzzyIsNull(Fnumber))
-        return QVariant("零");
+    double d = roundToQStr(value, digit).toDouble();
+    if (qFuzzyIsNull(d))
+        return "零";
     //判断正负号
     QString numberSign; //存储符号
-    if (Fnumber < 0)
+    if (d < 0)
         numberSign = "负";
     //将数据的绝对值 转换成字符串，如-58 转成 “58.00”
-    QString number = QString::number(qAbs(Fnumber), 'f', 2); //qAbs绝对值 ，保留两位小数
-    QString Left_of_Point;                                   //整数部分
+    QString number = QString::number(std::abs(d), 'f', 2); //qAbs绝对值
+    QString Left_of_Point;                                 //整数部分
     int length = number.length() - 3; //整数部分的长度，（精确度为2，去除小数和小数点）
+
     if (length > 12) {
         //qDebug()<<"输入的数值超过范围！"
         return "输入的数值超过范围！";
@@ -2001,19 +2021,32 @@ QVariant ScriptFunctionsManager::CNYBig(QVariant value, int digit)
     return "cny exception";
 }
 
-QVariant ScriptFunctionsManager::round(QVariant value, int digit)
+QVariant ScriptFunctionsManager::CNYBig(QVariant value)
+{
+    return converBigRMB(value.toDouble(), 0);
+}
+
+QVariant ScriptFunctionsManager::CNYBig2(QVariant value)
+{
+    return converBigRMB(value.toDouble(), -2);
+}
+
+QVariant ScriptFunctionsManager::roundToQStr(QVariant value, int digit, bool reserveLastZero)
 {
     double d = value.toDouble();
-    double lp = qPow(10.0, digit);
+    double lp = std::pow(10.0, digit);
     if (d < 0) {
-        d = qCeil(d / lp - 0.500000001) * lp;
+        d = std::ceil(d / lp - 0.500000001) * lp;
     } else {
-        d = qFloor(d / lp + 0.500000001) * lp;
+        d = std::floor(d / lp + 0.500000001) * lp;
     }
     if (digit > 0)
         digit = 0;
     QString str = QString::number(d, 'f', qAbs(digit));
-    return str.replace(QRegExp("(\\.){0,1}0+$"), "");
+    if (reserveLastZero)
+        return str;
+    else
+        return str.replace(QRegExp("(\\.){0,1}0+$"), "");
 }
 
 QVariant ScriptFunctionsManager::cnNYR(QVariant value)
