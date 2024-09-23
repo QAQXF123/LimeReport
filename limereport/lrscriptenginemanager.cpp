@@ -2009,13 +2009,13 @@ QString ScriptFunctionsManager::converBigRMB(double value, int digit)
         QString Bigcn = numberSign + Left_of_Point + "元整";
         return Bigcn;
     } else if (number[totalLength - 2] != '0' && number[totalLength - 1] == '0') {
-        QString Bigcn = numberSign + Left_of_Point + "点"
-                        + numerical_value[number[totalLength - 2].toLatin1() - '0'] + "元";
+        QString Bigcn = numberSign + Left_of_Point + "元"
+                        + numerical_value[number[totalLength - 2].toLatin1() - '0'] + "角";
         return Bigcn;
     } else {
-        QString Bigcn = numberSign + Left_of_Point + "点"
-                        + numerical_value[number[totalLength - 2].toLatin1() - '0']
-                        + numerical_value[number[totalLength - 1].toLatin1() - '0'] + "元";
+        QString Bigcn = numberSign + Left_of_Point + "元"
+                        + numerical_value[number[totalLength - 2].toLatin1() - '0'] + "角"
+                        + numerical_value[number[totalLength - 1].toLatin1() - '0'] + "分";
         return Bigcn;
     }
     return "cny exception";
