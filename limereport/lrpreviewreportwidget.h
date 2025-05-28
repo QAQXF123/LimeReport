@@ -54,6 +54,7 @@ public slots:
 
     void print();
     void printToPDF();
+    void printToExcel();
     void pageNavigatorChanged(int value);
     void loadFromFile(QString &fileName); // add by hwf
     void saveToFile();

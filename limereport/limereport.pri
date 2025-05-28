@@ -1,5 +1,5 @@
 include(../common.pri)
-
+include(../../QXlsx/QXlsx/QXlsx.pri)
 contains(CONFIG, embedded_designer) {
     include(designer.pri)
     message(embedded designer)
@@ -18,6 +18,7 @@ SOURCES += \
     $$PWD/bands/lrpagecontentfooter.cpp \
     $$PWD/exporters/lrexcelexportor.cpp \
     $$PWD/exporters/lrwordexportor.cpp \
+    $$PWD/lrexcelhandler.cpp \
     $$PWD/scripteditor/lrcompletermodel.cpp \
     $$REPORT_PATH/bands/lrpageheader.cpp \
     $$REPORT_PATH/bands/lrpagefooter.cpp \
@@ -103,6 +104,7 @@ HEADERS += \
     $$PWD/exporters/lrexcelexportor.h \
     $$PWD/exporters/lrwordexportor.h \
     $$PWD/items/lreditableimageitemintf.h \
+    $$PWD/lrexcelhandler.h \
     $$PWD/scripteditor/lrcompletermodel.h \
     $$REPORT_PATH/base/lrsingleton.h \
     $$REPORT_PATH/base/lrsimpleabstractfactory.h \

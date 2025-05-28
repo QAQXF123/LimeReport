@@ -1,6 +1,8 @@
 TEMPLATE = subdirs
 
 include(common.pri)
+include(../QXlsx/QXlsx/QXlsx.pri)
+
 
 CONFIG += ordered
 

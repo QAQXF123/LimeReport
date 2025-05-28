@@ -28,8 +28,13 @@ bool ExcelExportor::exportPages(ReportPages pages,
                                 const QMap<QString, QVariant> &params)
 {
     Q_UNUSED(params);
-    if (!fileName.isEmpty()) {
-        //
+    if (!fileName.isEmpty()){
+    
+        bool isSingleHeader = params["isSingleHeader"].toBool();
+        if (!pages.isEmpty()){
+            m_reportEngine->printPagesExcel(pages, fileName, isSingleHeader);
+        }
+        // m_reportEngine->emitPrintedToPDF(fileName);
         return true;
     }
     return false;
