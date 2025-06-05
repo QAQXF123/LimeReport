@@ -112,18 +112,49 @@ QList<QString> PreviewReportWidget::aviableExporters() {
     return d_ptr->aviableExporters();
 }
 
-bool PreviewReportWidget::exportReport(QString exporterName, const QMap<QString, QVariant>& params) {
+bool PreviewReportWidget::exportReport(QString exporterName) {
     if (ExportersFactory::instance().map().contains(exporterName)) {
 
         ReportExporterInterface* e = ExportersFactory::instance().objectCreator(exporterName)(d_ptr->m_report);
-        QString defaultFileName = d_ptr->m_report->defaultExportDir() + d_ptr->m_report->reportName().split(".")[0];
+        QString defaultFileName = m_preExportDir + d_ptr->m_report->reportName().split(".")[0];
+
         QString filter = QString("%1 (*.%2)").arg(e->exporterName()).arg(e->exporterFileExt());
         QString fileName = QFileDialog::getSaveFileName(this, tr("%1 file name").arg(e->exporterName()), defaultFileName, filter);
         if (!fileName.isEmpty()) {
             QFileInfo fi(fileName);
+            m_preExportDir = QFileInfo(fileName).absolutePath();
+            if (fi.suffix().isEmpty())
+                fileName += QString(".%1").arg(e->exporterFileExt());
+            bool result = e->exportPages(d_ptr->m_reportPages, fileName);
+            delete e;
+            return result;
+        }
+    }
+    return false;
+}
+
+bool PreviewReportWidget::exportReport(QString exporterName, QMap<QString, QVariant>& params) {
+    if (ExportersFactory::instance().map().contains(exporterName)) {
+
+        ReportExporterInterface* e = ExportersFactory::instance().objectCreator(exporterName)(d_ptr->m_report);
+        QString defaultFileName = QApplication::applicationDirPath() + d_ptr->m_report->reportName().split(".")[0];
+       
+        QString filter = QString("%1 (*.%2)").arg(e->exporterName()).arg(e->exporterFileExt());
+
+       
+        QString fileNameInParam = params["fileName"].toString();
+        if (!fileNameInParam.isEmpty()) {
+            defaultFileName = m_preExportDir + "/" + fileNameInParam;
+        }
+
+        QString fileName = QFileDialog::getSaveFileName(this, tr("%1 file name").arg(e->exporterName()), defaultFileName, filter);
+        if (!fileName.isEmpty()) {
+            QFileInfo fi(fileName);
+            m_preExportDir = QFileInfo(fileName).absolutePath();
             if (fi.suffix().isEmpty())
                 fileName += QString(".%1").arg(e->exporterFileExt());
             bool result = e->exportPages(d_ptr->m_reportPages, fileName, params);
+            params["outFilePath"] = fileName;
             delete e;
             return result;
         }
@@ -225,6 +256,7 @@ void PreviewReportWidget::print() {
     if (!pi.defaultPrinter().isNull()) {
 #if QT_VERSION >= 0x050300
         lp.setPrinterName(pi.defaultPrinterName());
+        qDebug() << "0x050300 defaultPrinterName:" << pi.defaultPrinterName();
 #else
         lp.setPrinterName(pi.defaultPrinter().printerName());
 #endif
@@ -238,22 +270,33 @@ void PreviewReportWidget::print() {
     }
 }
 
-void PreviewReportWidget::printToPDF() {
+QString PreviewReportWidget::printToPDF(const QString& fileName) {
+    QString outFilePath;
     if (!d_ptr->m_reportPages.isEmpty()) {
-        exportReport("PDF");
+        QMap<QString, QVariant> params;
+        params["fileName"] = fileName;
+        outFilePath = exportReport("PDF", params);
         foreach (PageItemDesignIntf::Ptr pageItem, d_ptr->m_reportPages) {
             d_ptr->m_previewPage->reactivatePageItem(pageItem);
         }
     }
+    return outFilePath;
 }
 
-void PreviewReportWidget::printToExcel() {
+QString PreviewReportWidget::printToExcel(const QString& fileName) {
+    QString outFilePath;
     if (!d_ptr->m_reportPages.isEmpty()) {
-        exportReport("Excel");
+        QMap<QString, QVariant> params;
+        params["fileName"] = fileName;
+        exportReport("Excel", params);
+        outFilePath = params["outFilePath"].toString();
+
         foreach (PageItemDesignIntf::Ptr pageItem, d_ptr->m_reportPages) {
             d_ptr->m_previewPage->reactivatePageItem(pageItem);
         }
     }
+
+    return outFilePath;
 }
 
 void PreviewReportWidget::pageNavigatorChanged(int value) {

@@ -1,36 +1,30 @@
 #include "lrexcelhandler.h"
 namespace LimeReport {
 
-ExcelHandler::ExcelHandler(bool isSingleHeader) : m_isSingleHeader(isSingleHeader) {
-
+ExcelHandler::ExcelHandler(bool isSingleHeader)
+    : m_isSingleHeader(isSingleHeader) {
 }
 
-void ExcelHandler::exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc, int& startRow) {
+void ExcelHandler::exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc, int& startRow, const QString& sheetName) {
     // qDebug() << "new handler begin 2";
     PageItemDesignIntf* pageItem = page.get();
     QList<BaseDesignIntf*> pageChildren = pageItem->childBaseItems();
 
-    
-
     if (m_xInfos.empty()) {
         getXInfoByAllXInfo(pageChildren);
     }
-    
+
     //  getXInfoByMostCol(pageChildren);
 
     std::sort(m_xInfos.begin(), m_xInfos.end(), [&](const XInfo& a, const XInfo& b) {
         return a.x < b.x;
     });
 
-
-
     for (int i = 0; i < m_xInfos.size(); i++) {
         double mmWidth = m_xInfos[i].width;
         double excelColWidth = mmWidth / m_mmPerX;
         doc.setColumnWidth(i + 1, excelColWidth);
     }
-
-
 
     for (BaseDesignIntf* base : pageChildren) {
         // qDebug() << "base ObjectName:" << base->objectName() << "class name:" << base->metaObject()->className();
@@ -44,7 +38,11 @@ void ExcelHandler::exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc
             m_isPrintDataBand = true;
             handleDesign(base, doc, startRow);
         } else {
-            if (!m_isSingleHeader || (startRow == 0 && !m_isPrintDataBand)) {
+
+            // 单表头的打印
+            // 第一种情况  第一页并且没有打印过数据行  认为是表头  可以打印
+            // 第二种情况   为单行并且出现 合计 小计等关键词 判定为合计行 可以打印
+            if (!m_isSingleHeader || (startRow == 0 && !m_isPrintDataBand) || isTotalLine(base)) {
                 handleDesign(base, doc, startRow, true);
             }
         }
@@ -78,7 +76,12 @@ void ExcelHandler::getAllCells(BaseDesignIntf* base, QVector<CellInfo>& cells, i
             getAllCells(layoutBase, cells, parentX + layout->geometry().x(), parentY + layout->geometry().y());
         }
     }
+
+    std::sort(cells.begin(), cells.end(), [&](const CellInfo& a, const CellInfo& b) {
+        return a.yInfo.y < b.yInfo.y || (a.yInfo.y == b.yInfo.y && a.xInfo.x < b.xInfo.x);
+    });
 }
+
 
 // isFixed 表示固定的格式
 void ExcelHandler::handleDesign(BaseDesignIntf* base, Document& doc, int& startRow, bool isFixed) {
@@ -86,40 +89,9 @@ void ExcelHandler::handleDesign(BaseDesignIntf* base, Document& doc, int& startR
     QVector<CellInfo> cells;
     getAllCells(base, cells);
 
-
-    QList<BaseDesignIntf*> bandChildren = base->childBaseItems();
-
     // 获取单元格信息
 
-    std::sort(cells.begin(), cells.end(), [&](const CellInfo& a, const CellInfo& b) {
-        return a.yInfo.y < b.yInfo.y || (a.yInfo.y == b.yInfo.y && a.xInfo.x < b.xInfo.x);
-    });
-
-
-
-    QVector<CellInfo> cellRow;
-    QVector<QVector<CellInfo>> cellRows;
-
-    // 把单元格按行划分
-    for (const auto& cell : cells) {
-        if (cellRow.empty()) {
-            cellRow.push_back(cell);
-        } else {
-            // 判断在不在同一行 误差处理
-            if (std::abs(cellRow.back().yInfo.y - cell.yInfo.y) > m_precision) {
-                cellRows.push_back(cellRow);
-                cellRow.clear();
-                cellRow.push_back(cell);
-            } else {
-                cellRow.push_back(cell);
-            }
-        }
-    }
-    if (!cellRow.empty()) {
-        cellRows.push_back(cellRow);
-    }
-
-
+    auto cellRows = getCellRows(cells);
 
     // 获取每行的高度 用行里最矮的列作为行的高度
     QVector<YInfo> yInfos(cellRows.size());
@@ -135,17 +107,11 @@ void ExcelHandler::handleDesign(BaseDesignIntf* base, Document& doc, int& startR
         yInfos[i].height = min_height;
     }
 
-  
-
-
-
     for (int i = 0; i < yInfos.size(); i++) {
         // qDebug() << "set row height" << startRow + i + 1 << "," << yInfos[i].y / m_mmPerY;
         doc.setRowHeight(startRow + i + 1, yInfos[i].height / m_mmPerY);
     }
-        
 
-    
     // 按行处理单元格
     for (int i = 0; i < cellRows.size(); i++) {
         // qDebug() << "row begin" << i << " begin";
@@ -178,21 +144,17 @@ void ExcelHandler::handleDesign(BaseDesignIntf* base, Document& doc, int& startR
                 doc.mergeCells(cellRange, fmt);
             }
 
-      
-
             // qDebug() << "cell.xInfo.x" << cell.xInfo.x << "," << "cell.xInfo.width" << cell.xInfo.width;
             // qDebug() << "cell.yInfo.y" << cell.yInfo.y << "," << "cell.yInfo.height" << cell.yInfo.height;
 
             // qDebug() << "write" << cell.firstRow + 1 << "," << cell.firstCol + 1 << "," << cell.text << "begin";
             // qDebug() << cell.firstCol << "," << cell.lastCol << "," << cell.firstRow << "," << cell.lastRow;
 
-
             if (m_isSingleHeader && startRow == 0 && isFixed) {
                 QString replacePageCnt;
                 if (replacePageCntWhenSingleHeader(cell.text, replacePageCnt)) {
                     cell.text = replacePageCnt;
                 }
-
             }
 
             doc.write(cell.firstRow + 1, cell.firstCol + 1, cell.text, fmt);
@@ -206,12 +168,11 @@ void ExcelHandler::handleDesign(BaseDesignIntf* base, Document& doc, int& startR
 
 void ExcelHandler::setFmt(TextItem* ti, Format& srcFmt) {
 
-   
     setFont(ti, srcFmt);
     setBorderLine(ti->borderLines(), srcFmt);
     setAlignment(ti->alignment(), srcFmt);
 
-    auto &dstFmt = srcFmt;
+    auto& dstFmt = srcFmt;
 
     dstFmt.setFontColor(Qt::black);
     dstFmt.setTextWrap(true); // 自动换行
@@ -223,7 +184,6 @@ void ExcelHandler::setFmt(TextItem* ti, Format& srcFmt) {
     dstFmt.setTopBorderColor(srcFmt.topBorderColor());
     dstFmt.setBottomBorderStyle(srcFmt.bottomBorderStyle());
     dstFmt.setBottomBorderColor(srcFmt.bottomBorderColor());
-
 }
 
 void ExcelHandler::setFont(const TextItem* ti, Format& fmt) {
@@ -414,8 +374,6 @@ void ExcelHandler::getXInfoByMostCol(const QList<BaseDesignIntf*>& pageChildren)
         QVector<CellInfo> cells;
         getAllCells(base, cells);
 
-        QList<BaseDesignIntf*> bandChildren = base->childBaseItems();
-
         // 获取单元格信息
 
         std::sort(cells.begin(), cells.end(), [&](const CellInfo& a, const CellInfo& b) {
@@ -486,9 +444,6 @@ void ExcelHandler::getXInfoByDataBand(const QList<BaseDesignIntf*>& pageChildren
     }
 }
 
-
-
-
 bool ExcelHandler::replacePageCntWhenSingleHeader(const QString& in, QString& out) {
     QString matchRule = "第页共页";
     if (in.isEmpty() || in[0] != matchRule[0]) {
@@ -500,9 +455,7 @@ bool ExcelHandler::replacePageCntWhenSingleHeader(const QString& in, QString& ou
         if (in[i] == matchRule[j]) {
             j++;
         }
-        
     }
-
 
     if (j == matchRule.size()) {
         out = "第  1  页  共 1 页";
@@ -510,9 +463,63 @@ bool ExcelHandler::replacePageCntWhenSingleHeader(const QString& in, QString& ou
     }
 
     return false;
-
-}
-
 }
 
 
+// 判断是否是合计行
+bool ExcelHandler::isTotalLine(BaseDesignIntf* base) {
+    QVector<CellInfo> cells;
+    getAllCells(base, cells);
+
+    // 获取单元格信息
+
+    auto cellRows = getCellRows(cells);
+
+    if (cellRows.size() != 1) {
+        return false;
+    }
+    auto& cellRow = cellRows[0];
+
+    static QSet<QString> totalKeyWords { "合计", /*"小计"*/ };
+
+
+    for (const auto& cell : cellRow) {
+        for (const auto& word : totalKeyWords) {
+            if (cell.text.contains(word)) {
+                return true;
+            }
+        }        
+    }
+    
+
+    return false;
+}
+
+
+
+QVector<QVector<CellInfo>> ExcelHandler::getCellRows(const QVector<CellInfo>& cells) {
+        QVector<CellInfo> cellRow;
+        QVector<QVector<CellInfo>> cellRows;
+
+        // 把单元格按行划分
+        for (const auto& cell : cells) {
+            if (cellRow.empty()) {
+                cellRow.push_back(cell);
+            } else {
+                // 判断在不在同一行 误差处理
+                if (std::abs(cellRow.back().yInfo.y - cell.yInfo.y) > m_precision) {
+                    cellRows.push_back(cellRow);
+                    cellRow.clear();
+                    cellRow.push_back(cell);
+                } else {
+                    cellRow.push_back(cell);
+                }
+            }
+        }
+        if (!cellRow.empty()) {
+            cellRows.push_back(cellRow);
+        }
+        return cellRows;
+    }
+
+} // namespace

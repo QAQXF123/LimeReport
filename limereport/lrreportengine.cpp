@@ -368,14 +368,35 @@ void ReportEnginePrivate::printPages(ReportPages pages, QMap<QString, QPrinter*>
     emit printingFinished();
 }
 
-bool ReportEnginePrivate::printPagesExcel(ReportPages pages, const QString& fileName, bool isSingleHeader) {
+bool ReportEnginePrivate::printPagesExcel(ReportPages pages, const QString& fileName, const QString& sheetName, bool isSingleHeader) {
 
     try {
         int currenPage = 1;
         if (pages.count() > 0) {
             int startRow = 0;
-            QXlsx::Document xlsx;
+            QXlsx::Document xlsx(fileName);
+
+
+            if (pages.count() == 1) {
+                // 单页不启用分页
+                isSingleHeader = false;
+            }
+
             ExcelHandler excelHandler(isSingleHeader);
+
+            QString currentSheetName = sheetName;
+
+            int sheetCounter = 1;
+
+            while (xlsx.sheetNames().contains(currentSheetName)) {
+                currentSheetName = QString("%1_%2").arg(sheetName).arg(sheetCounter++);
+            }
+
+            // 添加新工作表
+            if (!xlsx.addSheet(currentSheetName)) {
+                throw ReportError(QObject::tr("无法创建工作表: %1").arg(currentSheetName));
+            }
+            xlsx.selectSheet(currentSheetName);
 
             foreach (PageItemDesignIntf::Ptr page, pages) {
                 if (!m_cancelPrinting) {
@@ -386,12 +407,16 @@ bool ReportEnginePrivate::printPagesExcel(ReportPages pages, const QString& file
                 }
                 currenPage++;
             }
-            xlsx.saveAs(fileName);
+            if (!xlsx.saveAs(fileName)) {
+                throw ReportError(QObject::tr("保存Excel文件失败: %1").arg(fileName));
+            }
             // qDebug() << "save fileName" << fileName << " ok";
             // emit printingFinished();
         }
     } catch (ReportError& exception) {
+        // qDebug() << "WWWWWW " << exception.what();
         saveError(exception.what());
+        return false;
     }
     return true;
 }

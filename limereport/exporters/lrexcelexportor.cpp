@@ -4,8 +4,7 @@
 
 namespace {
 
-LimeReport::ReportExporterInterface *createExcelExporter(LimeReport::ReportEnginePrivate *parent)
-{
+LimeReport::ReportExporterInterface* createExcelExporter(LimeReport::ReportEnginePrivate* parent) {
     return new LimeReport::ExcelExportor(parent);
 }
 
@@ -18,23 +17,28 @@ bool VARIABLE_IS_NOT_USED registred = LimeReport::ExportersFactory::instance().r
 
 namespace LimeReport {
 
-ExcelExportor::ExcelExportor(ReportEnginePrivate *parent)
+ExcelExportor::ExcelExportor(ReportEnginePrivate* parent)
     : QObject(parent)
-    , m_reportEngine(parent)
-{}
+    , m_reportEngine(parent) { }
 
 bool ExcelExportor::exportPages(ReportPages pages,
-                                const QString &fileName,
-                                const QMap<QString, QVariant> &params)
-{
+    const QString& fileName,
+    const QMap<QString, QVariant>& params) {
     Q_UNUSED(params);
-    if (!fileName.isEmpty()){
-    
+    if (!fileName.isEmpty()) {
+
         bool isSingleHeader = params["isSingleHeader"].toBool();
-        if (!pages.isEmpty()){
-            m_reportEngine->printPagesExcel(pages, fileName, isSingleHeader);
+
+        QString excelSheetName = params["excelSheetName"].toString();
+
+        // 默认就用文件
+        if (excelSheetName.isEmpty()) {
+            excelSheetName = QFileInfo(fileName).baseName();
         }
-        // m_reportEngine->emitPrintedToPDF(fileName);
+
+        if (!pages.isEmpty()) {
+            m_reportEngine->printPagesExcel(pages, fileName, excelSheetName, isSingleHeader);
+        }
         return true;
     }
     return false;

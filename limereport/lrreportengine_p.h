@@ -162,7 +162,7 @@ class ReportEnginePrivate : public QObject,
     friend class PreviewReportWidget;
 
 public:
-    bool printPagesExcel(ReportPages pages, const QString& fileName, bool isSingleHeader = false);
+    bool printPagesExcel(ReportPages pages, const QString& fileName, const QString& sheetName = "Sheet1", bool isSingleHeader = false);
     bool printPages(ReportPages pages, QPrinter* printer);
     void printPages(ReportPages pages, QMap<QString, QPrinter*> printers, bool printToAllPrinters = false);
     Q_INVOKABLE QStringList aviableReportTranslations();

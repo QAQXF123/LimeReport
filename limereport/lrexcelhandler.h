@@ -49,7 +49,7 @@ public:
         TextItem* ti;
     };
 
-    void exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc, int& startRow);
+    void exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc, int& startRow, const QString& sheetName = "Sheet1");
 
 private:
 
@@ -61,7 +61,17 @@ private:
 
     QVector<XInfo> m_xInfos;
 
+
+
+    // 获取所有单元格相信
     void getAllCells(BaseDesignIntf* base, QVector<CellInfo>& cells, int parentX = 0, int parentY = 0);
+
+    // 解析单元格坐标 根据坐标选择单页格位置
+    QVector<QVector<CellInfo>> getCellRows(const QVector<CellInfo>& cells);
+
+
+    // 判断是否为合计栏  
+    bool isTotalLine(BaseDesignIntf* base);
 
     // isFixed 表示固定的格式较复杂需要手动处理
     void handleDesign(BaseDesignIntf* base, Document& doc, int& startRow, bool isFixed = false);
