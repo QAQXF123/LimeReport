@@ -370,12 +370,12 @@ void ReportEnginePrivate::printPages(ReportPages pages, QMap<QString, QPrinter*>
 
 bool ReportEnginePrivate::printPagesExcel(ReportPages pages, const QString& fileName, const QString& sheetName, bool isSingleHeader) {
 
+    qDebug() << "XD0606 ReportEnginePrivate::printPagesExcel " << fileName;
     try {
         int currenPage = 1;
         if (pages.count() > 0) {
             int startRow = 0;
             QXlsx::Document xlsx(fileName);
-
 
             if (pages.count() == 1) {
                 // 单页不启用分页
@@ -407,8 +407,20 @@ bool ReportEnginePrivate::printPagesExcel(ReportPages pages, const QString& file
                 }
                 currenPage++;
             }
-            if (!xlsx.saveAs(fileName)) {
-                throw ReportError(QObject::tr("保存Excel文件失败: %1").arg(fileName));
+
+            // 切换到第一页
+            if (xlsx.sheetNames().count() > 0) {
+                xlsx.selectSheet(xlsx.sheetNames().first());
+            }
+
+            QFileInfo fileInfo(fileName);
+            auto outFileName = fileName;
+            if (fileInfo.suffix().isEmpty()) {
+                outFileName += QString(".xlsx");
+            }
+
+            if (!xlsx.saveAs(outFileName)) {
+                throw ReportError(QObject::tr("保存Excel文件失败: %1").arg(outFileName));
             }
             // qDebug() << "save fileName" << fileName << " ok";
             // emit printingFinished();

@@ -5,7 +5,7 @@ ExcelHandler::ExcelHandler(bool isSingleHeader)
     : m_isSingleHeader(isSingleHeader) {
 }
 
-void ExcelHandler::exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc, int& startRow, const QString& sheetName) {
+void ExcelHandler::exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc, int& startRow) {
     // qDebug() << "new handler begin 2";
     PageItemDesignIntf* pageItem = page.get();
     QList<BaseDesignIntf*> pageChildren = pageItem->childBaseItems();

@@ -56,7 +56,7 @@ public slots:
 
     void print();
     QString printToPDF(const QString& fileName = "");
-    QString printToExcel(const QString& fileName = "");
+    QString printToExcel(const QString& fileName = "", bool isSingle = false);
     void pageNavigatorChanged(int value);
     void loadFromFile(QString& fileName); // add by hwf
     void saveToFile();

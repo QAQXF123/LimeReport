@@ -154,7 +154,10 @@ bool PreviewReportWidget::exportReport(QString exporterName, QMap<QString, QVari
             if (fi.suffix().isEmpty())
                 fileName += QString(".%1").arg(e->exporterFileExt());
             bool result = e->exportPages(d_ptr->m_reportPages, fileName, params);
-            params["outFilePath"] = fileName;
+            if (result) {
+                params["outFilePath"] = fileName;
+            }
+            
             delete e;
             return result;
         }
@@ -283,11 +286,12 @@ QString PreviewReportWidget::printToPDF(const QString& fileName) {
     return outFilePath;
 }
 
-QString PreviewReportWidget::printToExcel(const QString& fileName) {
+QString PreviewReportWidget::printToExcel(const QString& fileName, bool isSingle) {
     QString outFilePath;
     if (!d_ptr->m_reportPages.isEmpty()) {
         QMap<QString, QVariant> params;
         params["fileName"] = fileName;
+        params["isSingle"] = isSingle;
         exportReport("Excel", params);
         outFilePath = params["outFilePath"].toString();
 

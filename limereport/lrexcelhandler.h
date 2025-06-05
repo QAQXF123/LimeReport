@@ -11,45 +11,53 @@
 namespace LimeReport {
 
 using namespace QXlsx;
+
+struct XInfo {
+    double x;
+    double width;
+};
+
+struct YInfo {
+    double y;
+    double height;
+};
+
+
+
+// 单元格信息
+struct CellInfo {
+    CellInfo() {
+        ti = nullptr;
+        firstCol = -1;
+        lastCol = -1;
+        firstRow = -1;
+        lastRow = -1;
+    }
+
+    int firstCol;
+    int lastCol;
+    int firstRow;
+    int lastRow;
+
+    YInfo yInfo;
+    XInfo xInfo;
+    QString text;
+    TextItem* ti;
+};
+
+
+
 //ExcelHandler begin
 class ExcelHandler {
+
+
 
 public:
 
     ExcelHandler(bool isSingleHeader = false);
 
-    struct XInfo {
-        double x;
-        double width;
-    };
 
-    struct YInfo {
-        double y;
-        double height;
-    };
-
-    // 单元格信息
-    struct CellInfo {
-        CellInfo() {
-            ti = nullptr;
-            firstCol = -1;
-            lastCol = -1;
-            firstRow = -1;
-            lastRow = -1;
-        }
-
-        int firstCol;
-        int lastCol;
-        int firstRow;
-        int lastRow;
-
-        YInfo yInfo;
-        XInfo xInfo;
-        QString text;
-        TextItem* ti;
-    };
-
-    void exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc, int& startRow, const QString& sheetName = "Sheet1");
+    void exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc, int& startRow);
 
 private:
 
