@@ -57,7 +57,7 @@ public:
     ExcelHandler(bool isSingleHeader = false);
 
 
-    void exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc, int& startRow);
+	void exportPageToExcel(PageItemDesignIntf::Ptr page, Document& doc, int& startRow);
 
 private:
 
