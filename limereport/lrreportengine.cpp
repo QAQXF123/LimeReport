@@ -523,7 +523,7 @@ bool ReportEnginePrivate::printToPDF(const QString& fileName) {
     return exportReport("PDF", fileName);
 }
 
-bool ReportEnginePrivate::exportReport(QString exporterName, const QString& fileName, const QMap<QString, QVariant>& params) {
+bool ReportEnginePrivate::exportReport(QString exporterName, const QString& fileName) {
     QString fn = fileName;
     if (ExportersFactory::instance().map().contains(exporterName)) {
         ReportExporterInterface* e = ExportersFactory::instance().objectCreator(exporterName)(this);
@@ -542,7 +542,42 @@ bool ReportEnginePrivate::exportReport(QString exporterName, const QString& file
             dataManager()->setDesignTime(false);
             ReportPages pages = renderToPages();
             dataManager()->setDesignTime(designTime);
+            QMap<QString, QVariant> params;
             bool result = e->exportPages(pages, fn, params);
+            delete e;
+            return result;
+        }
+    }
+    return false;
+}
+
+bool ReportEnginePrivate::exportReport(QString exporterName, const QString& fileName, QMap<QString, QVariant>& params) {
+    QString fn = fileName;
+    if (ExportersFactory::instance().map().contains(exporterName)) {
+        ReportExporterInterface* e = ExportersFactory::instance().objectCreator(exporterName)(this);
+        if (fn.isEmpty()) {
+            QString defaultFileName = reportName().split(".")[0];
+            QString filter = QString("%1 (*.%2)").arg(e->exporterName()).arg(e->exporterFileExt());
+            QString fileName = params["fileName"].toString();
+            if (!fileName.isEmpty()) {
+                defaultFileName = fileName;
+            }
+            fn = QFileDialog::getSaveFileName(0, tr("%1 file name").arg(e->exporterName()), defaultFileName, filter);
+        }
+        if (!fn.isEmpty()) {
+            QFileInfo fi(fn);
+            if (fi.suffix().isEmpty())
+                fn += QString(".%1").arg(e->exporterFileExt());
+            if (fi.absolutePath().compare(QDir::currentPath()) == 0)
+                fn = defaultExportDir() + fn;
+            bool designTime = dataManager()->designTime();
+            dataManager()->setDesignTime(false);
+            ReportPages pages = renderToPages();
+            dataManager()->setDesignTime(designTime);
+            bool result = e->exportPages(pages, fn, params);
+            if (result) {
+                params["outFilePath"] = fn;
+            }
             delete e;
             return result;
         }
@@ -1467,7 +1502,13 @@ bool ReportEngine::printToPDF(const QString& fileName) {
     return d->printToPDF(fileName);
 }
 
-bool ReportEngine::exportReport(QString exporterName, const QString& fileName, const QMap<QString, QVariant>& params) {
+bool ReportEngine::exportReport(QString exporterName, const QString& fileName) {
+    Q_D(ReportEngine);
+    QMap<QString, QVariant> params;
+    return d->exportReport(exporterName, fileName, params);
+}
+
+bool ReportEngine::exportReport(QString exporterName, const QString& fileName, QMap<QString, QVariant>& params) {
     Q_D(ReportEngine);
     return d->exportReport(exporterName, fileName, params);
 }

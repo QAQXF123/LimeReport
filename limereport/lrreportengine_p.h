@@ -194,7 +194,8 @@ public:
     void printToFile(const QString& fileName);
     bool printToPDF(const QString& fileName);
     bool printToExcel(const QString& fileName);
-    bool exportReport(QString exporterName, const QString& fileName = "", const QMap<QString, QVariant>& params = QMap<QString, QVariant>());
+    bool exportReport(QString exporterName, const QString& fileName);
+    bool exportReport(QString exporterName, const QString& fileName, QMap<QString, QVariant>& params);
     void previewReport(PreviewHints hints = PreviewBarsUserSetting);
     void previewReport(QPrinter* printer, PreviewHints hints = PreviewBarsUserSetting);
 
